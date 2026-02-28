@@ -7,7 +7,7 @@ use generic_array::GenericArray;
 use hyper::{body::Buf, Body};
 use log::{debug, info};
 use num::BigUint;
-use rand::{rngs::OsRng, TryRngCore};
+use rand::{rngs::SysRng, TryRng};
 use sha2::{digest::Digest, Sha512};
 use signature::Signer;
 use srp::{
@@ -203,10 +203,10 @@ async fn handle_start(
 
     let mut salt = [0; 16]; // s
     let mut b = [0; 64];
-    OsRng
+    SysRng
         .try_fill_bytes(&mut salt)
         .expect("OsRng failed to fill bytes");
-    OsRng.try_fill_bytes(&mut b).expect("osrng err");
+    SysRng.try_fill_bytes(&mut b).expect("osrng err");
 
     // TODO - respect pairing flags (specification p. 35 - 7.) for split pair setup
 
