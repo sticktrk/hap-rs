@@ -1,6 +1,6 @@
 use handlebars::{Context, Handlebars, Helper, Output, RenderContext, RenderError, Renderable};
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::{
     collections::HashMap,
     fs::{self, File},
@@ -168,13 +168,13 @@ impl From<SystemMetadata> for RenderMetadata {
         let mut characteristic_out_values = HashMap::new();
 
         for (_, characteristic) in m.assistant.characteristics.clone() {
-            if let (Some(ref read_name), Some(ref values), &None) =
+            if let (Some(read_name), Some(values), &None) =
                 (&characteristic.read, &characteristic.values, &characteristic.out_values)
             {
                 characteristic_in_values.insert(read_name.clone(), values.clone());
             }
 
-            if let (Some(ref read_write_name), Some(ref values), &None) = (
+            if let (Some(read_write_name), Some(values), &None) = (
                 &characteristic.read_write,
                 &characteristic.values,
                 &characteristic.out_values,
@@ -207,10 +207,10 @@ impl From<SystemMetadata> for RenderMetadata {
 }
 
 fn if_eq_helper<'reg, 'rc>(
-    h: &Helper<'reg, 'rc>,
+    h: &Helper<'rc>,
     r: &'reg Handlebars,
-    c: &Context,
-    rc: &mut RenderContext<'reg>,
+    c: &'rc Context,
+    rc: &mut RenderContext<'reg, 'rc>,
     out: &mut dyn Output,
 ) -> Result<(), RenderError> {
     let first = h.param(0).unwrap().value();
@@ -664,7 +664,9 @@ fn array_length_helper(
     Ok(())
 }
 
-fn shorten_uuid(id: &str) -> String { id.trim_start_matches('0').to_owned() }
+fn shorten_uuid(id: &str) -> String {
+    id.trim_start_matches('0').to_owned()
+}
 
 fn snake_case_helper(
     h: &Helper,
