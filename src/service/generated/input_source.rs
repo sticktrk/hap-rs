@@ -39,7 +39,6 @@ pub struct InputSourceService {
     pub name: NameCharacteristic,
     /// Current Visibility State characteristic (required).
     pub current_visibility_state: CurrentVisibilityStateCharacteristic,
-
     /// Identifier characteristic (optional).
     pub identifier: Option<IdentifierCharacteristic>,
     /// Input Device Type characteristic (optional).

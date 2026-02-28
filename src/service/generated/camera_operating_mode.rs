@@ -33,7 +33,6 @@ pub struct CameraOperatingModeService {
     pub event_snapshots_active: EventSnapshotsActiveCharacteristic,
     /// HomeKit Camera Active characteristic (required).
     pub homekit_camera_active: HomekitCameraActiveCharacteristic,
-
     /// Camera Operating Mode Indicator characteristic (optional).
     pub camera_operating_mode_indicator: Option<CameraOperatingModeIndicatorCharacteristic>,
     /// Manually disabled characteristic (optional).

@@ -31,7 +31,6 @@ pub struct TargetControlService {
     pub active_identifier: ActiveIdentifierCharacteristic,
     /// Button Event characteristic (required).
     pub button_event: ButtonEventCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
 }

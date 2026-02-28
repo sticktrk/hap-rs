@@ -43,7 +43,6 @@ pub struct TelevisionService {
     pub remote_key: RemoteKeyCharacteristic,
     /// Sleep Discovery Mode characteristic (required).
     pub sleep_discovery_mode: SleepDiscoveryModeCharacteristic,
-
     /// Brightness characteristic (optional).
     pub brightness: Option<BrightnessCharacteristic>,
     /// Closed Captions characteristic (optional).

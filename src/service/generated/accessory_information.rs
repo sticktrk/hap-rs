@@ -44,7 +44,6 @@ pub struct AccessoryInformationService {
     pub name: NameCharacteristic,
     /// Serial Number characteristic (required).
     pub serial_number: SerialNumberCharacteristic,
-
     /// Accessory Flags characteristic (optional).
     pub accessory_flags: Option<AccessoryFlagsCharacteristic>,
     /// Application Matching Identifier characteristic (optional).

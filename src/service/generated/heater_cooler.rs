@@ -40,7 +40,6 @@ pub struct HeaterCoolerService {
     pub target_heater_cooler_state: TargetHeaterCoolerStateCharacteristic,
     /// Current Temperature characteristic (required).
     pub current_temperature: CurrentTemperatureCharacteristic,
-
     /// Lock Physical Controls characteristic (optional).
     pub lock_physical_controls: Option<LockPhysicalControlsCharacteristic>,
     /// Name characteristic (optional).

@@ -27,7 +27,6 @@ pub struct OutletService {
 
     /// Power State characteristic (required).
     pub power_state: PowerStateCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Outlet In Use characteristic (optional).

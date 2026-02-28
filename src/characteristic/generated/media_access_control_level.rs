@@ -14,20 +14,23 @@ use crate::{
 };
 
 // TODO - re-check MaximumDataLength
-/// Tap Type characteristic.
+/// Media Access Control Level characteristic.
 #[derive(Debug, Default, Serialize)]
-pub struct TapTypeCharacteristic(Characteristic<u16>);
+pub struct MediaAccessControlLevelCharacteristic(Characteristic<u8>);
 
-impl TapTypeCharacteristic {
-    /// Creates a new Tap Type characteristic.
+impl MediaAccessControlLevelCharacteristic {
+    /// Creates a new Media Access Control Level characteristic.
     pub fn new(id: u64, accessory_id: u64) -> Self {
         #[allow(unused_mut)]
-        let mut c = Self(Characteristic::<u16> {
+        let mut c = Self(Characteristic::<u8> {
             id,
             accessory_id,
-            hap_type: HapType::TapType,
-            format: Format::UInt16,
-            perms: vec![Perm::PairedRead],
+            hap_type: HapType::MediaAccessControlLevel,
+            format: Format::UInt8,
+            perms: vec![Perm::Events, Perm::PairedRead, Perm::PairedWrite],
+            max_value: Some(2),
+            min_value: Some(0),
+            step_value: Some(1),
             ..Default::default()
         });
 
@@ -44,7 +47,7 @@ impl TapTypeCharacteristic {
 }
 
 #[async_trait]
-impl HapCharacteristic for TapTypeCharacteristic {
+impl HapCharacteristic for MediaAccessControlLevelCharacteristic {
     fn get_id(&self) -> u64 {
         HapCharacteristic::get_id(&self.0)
     }
@@ -185,28 +188,28 @@ impl HapCharacteristic for TapTypeCharacteristic {
     }
 }
 
-impl HapCharacteristicSetup for TapTypeCharacteristic {
+impl HapCharacteristicSetup for MediaAccessControlLevelCharacteristic {
     fn set_event_emitter(&mut self, event_emitter: Option<pointer::EventEmitter>) {
         HapCharacteristicSetup::set_event_emitter(&mut self.0, event_emitter)
     }
 }
 
-impl CharacteristicCallbacks<u16> for TapTypeCharacteristic {
-    fn on_read(&mut self, f: Option<impl OnReadFn<u16>>) {
+impl CharacteristicCallbacks<u8> for MediaAccessControlLevelCharacteristic {
+    fn on_read(&mut self, f: Option<impl OnReadFn<u8>>) {
         CharacteristicCallbacks::on_read(&mut self.0, f)
     }
 
-    fn on_update(&mut self, f: Option<impl OnUpdateFn<u16>>) {
+    fn on_update(&mut self, f: Option<impl OnUpdateFn<u8>>) {
         CharacteristicCallbacks::on_update(&mut self.0, f)
     }
 }
 
-impl AsyncCharacteristicCallbacks<u16> for TapTypeCharacteristic {
-    fn on_read_async(&mut self, f: Option<impl OnReadFuture<u16>>) {
+impl AsyncCharacteristicCallbacks<u8> for MediaAccessControlLevelCharacteristic {
+    fn on_read_async(&mut self, f: Option<impl OnReadFuture<u8>>) {
         AsyncCharacteristicCallbacks::on_read_async(&mut self.0, f)
     }
 
-    fn on_update_async(&mut self, f: Option<impl OnUpdateFuture<u16>>) {
+    fn on_update_async(&mut self, f: Option<impl OnUpdateFuture<u8>>) {
         AsyncCharacteristicCallbacks::on_update_async(&mut self.0, f)
     }
 }

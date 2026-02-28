@@ -34,7 +34,6 @@ pub struct GarageDoorOpenerService {
     pub target_door_state: TargetDoorStateCharacteristic,
     /// Obstruction Detected characteristic (required).
     pub obstruction_detected: ObstructionDetectedCharacteristic,
-
     /// Lock Current State characteristic (optional).
     pub lock_current_state: Option<LockCurrentStateCharacteristic>,
     /// Lock Target State characteristic (optional).

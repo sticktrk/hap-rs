@@ -28,7 +28,6 @@ pub struct PowerManagementService {
 
     /// Wake Configuration characteristic (required).
     pub wake_configuration: WakeConfigurationCharacteristic,
-
     /// Selected Sleep Configuration characteristic (optional).
     pub selected_sleep_configuration: Option<SelectedSleepConfigurationCharacteristic>,
     /// Supported Sleep Configuration characteristic (optional).

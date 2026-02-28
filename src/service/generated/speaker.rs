@@ -28,7 +28,6 @@ pub struct SpeakerService {
 
     /// Mute characteristic (required).
     pub mute: MuteCharacteristic,
-
     /// Active characteristic (optional).
     pub active: Option<ActiveCharacteristic>,
     /// Volume characteristic (optional).

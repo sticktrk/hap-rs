@@ -33,7 +33,6 @@ pub struct WindowService {
     pub position_state: PositionStateCharacteristic,
     /// Target Position characteristic (required).
     pub target_position: TargetPositionCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Obstruction Detected characteristic (optional).

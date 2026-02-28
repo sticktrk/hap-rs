@@ -41,7 +41,6 @@ pub struct HumidifierDehumidifierService {
     pub target_humidifier_dehumidifier_state: TargetHumidifierDehumidifierStateCharacteristic,
     /// Current Relative Humidity characteristic (required).
     pub current_relative_humidity: CurrentRelativeHumidityCharacteristic,
-
     /// Lock Physical Controls characteristic (optional).
     pub lock_physical_controls: Option<LockPhysicalControlsCharacteristic>,
     /// Name characteristic (optional).

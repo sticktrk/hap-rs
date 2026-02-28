@@ -30,7 +30,6 @@ pub struct StatefulProgrammableSwitchService {
     pub programmable_switch_event: ProgrammableSwitchEventCharacteristic,
     /// Programmable Switch Output State characteristic (required).
     pub programmable_switch_output_state: ProgrammableSwitchOutputStateCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
 }

@@ -4,6 +4,7 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use crate::{
     characteristic::{
+        firmware_update_protocol_list::FirmwareUpdateProtocolListCharacteristic,
         firmware_update_readiness::FirmwareUpdateReadinessCharacteristic,
         firmware_update_status::FirmwareUpdateStatusCharacteristic,
         matter_firmware_update_status::MatterFirmwareUpdateStatusCharacteristic,
@@ -33,7 +34,8 @@ pub struct FirmwareUpdateService {
     pub firmware_update_readiness: FirmwareUpdateReadinessCharacteristic,
     /// Firmware Update Status characteristic (required).
     pub firmware_update_status: FirmwareUpdateStatusCharacteristic,
-
+    /// Firmware Update Protocol List characteristic (optional).
+    pub firmware_update_protocol_list: Option<FirmwareUpdateProtocolListCharacteristic>,
     /// Matter Firmware Update Status characteristic (optional).
     pub matter_firmware_update_status: Option<MatterFirmwareUpdateStatusCharacteristic>,
     /// Staged Firmware Version characteristic (optional).
@@ -57,17 +59,21 @@ impl FirmwareUpdateService {
                 id + 1 + 1,
                 accessory_id,
             ),
-            matter_firmware_update_status: Some(MatterFirmwareUpdateStatusCharacteristic::new(
+            firmware_update_protocol_list: Some(FirmwareUpdateProtocolListCharacteristic::new(
                 id + 1 + 0 + 2,
                 accessory_id,
             )),
-            staged_firmware_version: Some(StagedFirmwareVersionCharacteristic::new(
+            matter_firmware_update_status: Some(MatterFirmwareUpdateStatusCharacteristic::new(
                 id + 1 + 1 + 2,
+                accessory_id,
+            )),
+            staged_firmware_version: Some(StagedFirmwareVersionCharacteristic::new(
+                id + 1 + 2 + 2,
                 accessory_id,
             )),
             supported_firmware_update_configuration: Some(
                 SupportedFirmwareUpdateConfigurationCharacteristic::new(
-                    id + 1 + 2 + 2,
+                    id + 1 + 3 + 2,
                     accessory_id,
                 ),
             ),
@@ -141,6 +147,9 @@ impl HapService for FirmwareUpdateService {
             &self.firmware_update_readiness,
             &self.firmware_update_status,
         ];
+        if let Some(c) = &self.firmware_update_protocol_list {
+            characteristics.push(c);
+        }
         if let Some(c) = &self.matter_firmware_update_status {
             characteristics.push(c);
         }
@@ -159,6 +168,9 @@ impl HapService for FirmwareUpdateService {
             &mut self.firmware_update_readiness,
             &mut self.firmware_update_status,
         ];
+        if let Some(c) = &mut self.firmware_update_protocol_list {
+            characteristics.push(c);
+        }
         if let Some(c) = &mut self.matter_firmware_update_status {
             characteristics.push(c);
         }

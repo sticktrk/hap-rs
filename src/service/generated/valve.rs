@@ -34,7 +34,6 @@ pub struct ValveService {
     pub in_use: InUseCharacteristic,
     /// Valve Type characteristic (required).
     pub valve_type: ValveTypeCharacteristic,
-
     /// Is Configured characteristic (optional).
     pub is_configured: Option<IsConfiguredCharacteristic>,
     /// Name characteristic (optional).

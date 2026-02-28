@@ -29,7 +29,6 @@ pub struct HumiditySensorService {
 
     /// Current Relative Humidity characteristic (required).
     pub current_relative_humidity: CurrentRelativeHumidityCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Status Active characteristic (optional).

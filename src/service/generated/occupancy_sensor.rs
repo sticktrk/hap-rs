@@ -29,7 +29,6 @@ pub struct OccupancySensorService {
 
     /// Occupancy Detected characteristic (required).
     pub occupancy_detected: OccupancyDetectedCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Status Active characteristic (optional).

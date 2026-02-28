@@ -31,7 +31,6 @@ pub struct SmartSpeakerService {
     pub current_media_state: CurrentMediaStateCharacteristic,
     /// Target Media State characteristic (required).
     pub target_media_state: TargetMediaStateCharacteristic,
-
     /// AirPlay Enable characteristic (optional).
     pub airplay_enable: Option<AirplayEnableCharacteristic>,
     /// Configured Name characteristic (optional).

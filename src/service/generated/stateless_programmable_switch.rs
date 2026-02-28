@@ -27,7 +27,6 @@ pub struct StatelessProgrammableSwitchService {
 
     /// Programmable Switch Event characteristic (required).
     pub programmable_switch_event: ProgrammableSwitchEventCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Label Index characteristic (optional).

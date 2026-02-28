@@ -31,7 +31,6 @@ pub struct SlatsService {
     pub current_slat_state: CurrentSlatStateCharacteristic,
     /// Slat Type characteristic (required).
     pub slat_type: SlatTypeCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Swing Mode characteristic (optional).

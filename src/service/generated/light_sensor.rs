@@ -29,7 +29,6 @@ pub struct LightSensorService {
 
     /// Current Light Level characteristic (required).
     pub current_light_level: CurrentLightLevelCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Status Active characteristic (optional).

@@ -27,7 +27,6 @@ pub struct FaucetService {
 
     /// Active characteristic (required).
     pub active: ActiveCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Status Fault characteristic (optional).

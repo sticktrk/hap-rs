@@ -35,7 +35,6 @@ pub struct LockManagementService {
     pub lock_control_point: LockControlPointCharacteristic,
     /// Version characteristic (required).
     pub version: VersionCharacteristic,
-
     /// Administrator Only Access characteristic (optional).
     pub administrator_only_access: Option<AdministratorOnlyAccessCharacteristic>,
     /// Audio Feedback characteristic (optional).

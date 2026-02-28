@@ -43,7 +43,6 @@ pub struct ThermostatService {
     pub target_temperature: TargetTemperatureCharacteristic,
     /// Temperature Display Units characteristic (required).
     pub temperature_display_units: TemperatureDisplayUnitsCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Current Relative Humidity characteristic (optional).

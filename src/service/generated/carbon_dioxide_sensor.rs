@@ -31,7 +31,6 @@ pub struct CarbonDioxideSensorService {
 
     /// Carbon dioxide Detected characteristic (required).
     pub carbon_dioxide_detected: CarbonDioxideDetectedCharacteristic,
-
     /// Carbon dioxide Level characteristic (optional).
     pub carbon_dioxide_level: Option<CarbonDioxideLevelCharacteristic>,
     /// Carbon dioxide Peak Level characteristic (optional).

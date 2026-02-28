@@ -14,20 +14,20 @@ use crate::{
 };
 
 // TODO - re-check MaximumDataLength
-/// Crypto Hash characteristic.
+/// Firmware Update Protocol List characteristic.
 #[derive(Debug, Default, Serialize)]
-pub struct CryptoHashCharacteristic(Characteristic<Vec<u8>>);
+pub struct FirmwareUpdateProtocolListCharacteristic(Characteristic<Vec<u8>>);
 
-impl CryptoHashCharacteristic {
-    /// Creates a new Crypto Hash characteristic.
+impl FirmwareUpdateProtocolListCharacteristic {
+    /// Creates a new Firmware Update Protocol List characteristic.
     pub fn new(id: u64, accessory_id: u64) -> Self {
         #[allow(unused_mut)]
         let mut c = Self(Characteristic::<Vec<u8>> {
             id,
             accessory_id,
-            hap_type: HapType::CryptoHash,
+            hap_type: HapType::FirmwareUpdateProtocolList,
             format: Format::Tlv8,
-            perms: vec![Perm::PairedWrite, Perm::WriteResponse],
+            perms: vec![Perm::PairedRead],
             ..Default::default()
         });
 
@@ -44,7 +44,7 @@ impl CryptoHashCharacteristic {
 }
 
 #[async_trait]
-impl HapCharacteristic for CryptoHashCharacteristic {
+impl HapCharacteristic for FirmwareUpdateProtocolListCharacteristic {
     fn get_id(&self) -> u64 {
         HapCharacteristic::get_id(&self.0)
     }
@@ -185,13 +185,13 @@ impl HapCharacteristic for CryptoHashCharacteristic {
     }
 }
 
-impl HapCharacteristicSetup for CryptoHashCharacteristic {
+impl HapCharacteristicSetup for FirmwareUpdateProtocolListCharacteristic {
     fn set_event_emitter(&mut self, event_emitter: Option<pointer::EventEmitter>) {
         HapCharacteristicSetup::set_event_emitter(&mut self.0, event_emitter)
     }
 }
 
-impl CharacteristicCallbacks<Vec<u8>> for CryptoHashCharacteristic {
+impl CharacteristicCallbacks<Vec<u8>> for FirmwareUpdateProtocolListCharacteristic {
     fn on_read(&mut self, f: Option<impl OnReadFn<Vec<u8>>>) {
         CharacteristicCallbacks::on_read(&mut self.0, f)
     }
@@ -201,7 +201,7 @@ impl CharacteristicCallbacks<Vec<u8>> for CryptoHashCharacteristic {
     }
 }
 
-impl AsyncCharacteristicCallbacks<Vec<u8>> for CryptoHashCharacteristic {
+impl AsyncCharacteristicCallbacks<Vec<u8>> for FirmwareUpdateProtocolListCharacteristic {
     fn on_read_async(&mut self, f: Option<impl OnReadFuture<Vec<u8>>>) {
         AsyncCharacteristicCallbacks::on_read_async(&mut self.0, f)
     }

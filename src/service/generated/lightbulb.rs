@@ -33,7 +33,6 @@ pub struct LightbulbService {
 
     /// Power State characteristic (required).
     pub power_state: PowerStateCharacteristic,
-
     /// Brightness characteristic (optional).
     pub brightness: Option<BrightnessCharacteristic>,
     /// Characteristic Value Active Transition Count characteristic (optional).

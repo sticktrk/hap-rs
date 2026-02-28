@@ -29,7 +29,6 @@ pub struct ContactSensorService {
 
     /// Contact Sensor State characteristic (required).
     pub contact_sensor_state: ContactSensorStateCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Status Active characteristic (optional).

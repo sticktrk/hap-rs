@@ -33,7 +33,6 @@ pub struct IrrigationSystemService {
     pub program_mode: ProgramModeCharacteristic,
     /// In Use characteristic (required).
     pub in_use: InUseCharacteristic,
-
     /// Remaining Duration characteristic (optional).
     pub remaining_duration: Option<RemainingDurationCharacteristic>,
     /// Name characteristic (optional).

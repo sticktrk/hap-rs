@@ -29,6 +29,7 @@ pub enum AccessoryCategory {
     AirHumidifier = 22,
     AirDehumidifier = 23,
     AppleTv = 24,
+    Homepod = 25,
     Speaker = 26,
     Airport = 27,
     Sprinkler = 28,

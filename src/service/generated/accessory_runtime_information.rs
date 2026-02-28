@@ -4,8 +4,10 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use crate::{
     characteristic::{
-        activity_interval::ActivityIntervalCharacteristic, heart_beat::HeartBeatCharacteristic,
-        ping::PingCharacteristic, sleep_interval::SleepIntervalCharacteristic, HapCharacteristic,
+        activity_interval::ActivityIntervalCharacteristic,
+        connection_health_monitor::ConnectionHealthMonitorCharacteristic,
+        heart_beat::HeartBeatCharacteristic, ping::PingCharacteristic,
+        sleep_interval::SleepIntervalCharacteristic, HapCharacteristic,
     },
     service::HapService,
     HapType,
@@ -27,9 +29,10 @@ pub struct AccessoryRuntimeInformationService {
 
     /// Ping characteristic (required).
     pub ping: PingCharacteristic,
-
     /// Activity Interval characteristic (optional).
     pub activity_interval: Option<ActivityIntervalCharacteristic>,
+    /// Connection Health Monitor characteristic (optional).
+    pub connection_health_monitor: Option<ConnectionHealthMonitorCharacteristic>,
     /// Heart Beat characteristic (optional).
     pub heart_beat: Option<HeartBeatCharacteristic>,
     /// Sleep Interval characteristic (optional).
@@ -47,9 +50,13 @@ impl AccessoryRuntimeInformationService {
                 id + 1 + 0 + 1,
                 accessory_id,
             )),
-            heart_beat: Some(HeartBeatCharacteristic::new(id + 1 + 1 + 1, accessory_id)),
+            connection_health_monitor: Some(ConnectionHealthMonitorCharacteristic::new(
+                id + 1 + 1 + 1,
+                accessory_id,
+            )),
+            heart_beat: Some(HeartBeatCharacteristic::new(id + 1 + 2 + 1, accessory_id)),
             sleep_interval: Some(SleepIntervalCharacteristic::new(
-                id + 1 + 2 + 1,
+                id + 1 + 3 + 1,
                 accessory_id,
             )),
             ..Default::default()
@@ -122,6 +129,9 @@ impl HapService for AccessoryRuntimeInformationService {
         if let Some(c) = &self.activity_interval {
             characteristics.push(c);
         }
+        if let Some(c) = &self.connection_health_monitor {
+            characteristics.push(c);
+        }
         if let Some(c) = &self.heart_beat {
             characteristics.push(c);
         }
@@ -135,6 +145,9 @@ impl HapService for AccessoryRuntimeInformationService {
         #[allow(unused_mut)]
         let mut characteristics: Vec<&mut dyn HapCharacteristic> = vec![&mut self.ping];
         if let Some(c) = &mut self.activity_interval {
+            characteristics.push(c);
+        }
+        if let Some(c) = &mut self.connection_health_monitor {
             characteristics.push(c);
         }
         if let Some(c) = &mut self.heart_beat {

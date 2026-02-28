@@ -33,7 +33,6 @@ pub struct SecuritySystemService {
     pub security_system_current_state: SecuritySystemCurrentStateCharacteristic,
     /// Security System Target State characteristic (required).
     pub security_system_target_state: SecuritySystemTargetStateCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Security System Alarm Type characteristic (optional).

@@ -29,7 +29,6 @@ pub struct DiagnosticsService {
 
     /// Supported Diagnostics Snapshot characteristic (required).
     pub supported_diagnostics_snapshot: SupportedDiagnosticsSnapshotCharacteristic,
-
     /// Selected Diagnostics Modes characteristic (optional).
     pub selected_diagnostics_modes: Option<SelectedDiagnosticsModesCharacteristic>,
     /// Supported Diagnostics Modes characteristic (optional).

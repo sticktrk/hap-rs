@@ -29,7 +29,6 @@ pub struct DoorbellService {
 
     /// Programmable Switch Event characteristic (required).
     pub programmable_switch_event: ProgrammableSwitchEventCharacteristic,
-
     /// Brightness characteristic (optional).
     pub brightness: Option<BrightnessCharacteristic>,
     /// Mute characteristic (optional).

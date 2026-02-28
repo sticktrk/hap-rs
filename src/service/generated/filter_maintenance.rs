@@ -29,7 +29,6 @@ pub struct FilterMaintenanceService {
 
     /// Filter Change indication characteristic (required).
     pub filter_change_indication: FilterChangeIndicationCharacteristic,
-
     /// Filter Life Level characteristic (optional).
     pub filter_life_level: Option<FilterLifeLevelCharacteristic>,
     /// Filter Reset Change Indication characteristic (optional).

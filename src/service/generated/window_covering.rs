@@ -38,7 +38,6 @@ pub struct WindowCoveringService {
     pub position_state: PositionStateCharacteristic,
     /// Target Position characteristic (required).
     pub target_position: TargetPositionCharacteristic,
-
     /// Current Horizontal Tilt Angle characteristic (optional).
     pub current_horizontal_tilt_angle: Option<CurrentHorizontalTiltAngleCharacteristic>,
     /// Target Horizontal Tilt Angle characteristic (optional).

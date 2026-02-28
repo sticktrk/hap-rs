@@ -40,7 +40,6 @@ pub struct CameraRecordingManagementService {
         SupportedCameraRecordingConfigurationCharacteristic,
     /// Supported Video Recording Configuration characteristic (required).
     pub supported_video_recording_configuration: SupportedVideoRecordingConfigurationCharacteristic,
-
     /// recording audio active characteristic (optional).
     pub recording_audio_active: Option<RecordingAudioActiveCharacteristic>,
 }

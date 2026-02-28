@@ -775,7 +775,7 @@ impl ToString for HapType {
     fn to_string(&self) -> String {
         match self {
             HapType::Unknown => \"unknown\".into(),
-            HapType::Custom(uuid) => uuid.to_hyphenated().to_string(),
+            HapType::Custom(uuid) => uuid.hyphenated().to_string(),
 {{#each sorted_characteristics as |c|}}\
 \t\t\tHapType::{{pascal_case c.DefaultDescription}} => \"{{uuid c.ShortUUID}}\".into(),
 {{/each}}\

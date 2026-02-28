@@ -30,7 +30,6 @@ pub struct FanV2Service {
 
     /// Active characteristic (required).
     pub active: ActiveCharacteristic,
-
     /// Current Fan State characteristic (optional).
     pub current_fan_state: Option<CurrentFanStateCharacteristic>,
     /// Target Fan State characteristic (optional).

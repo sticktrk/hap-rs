@@ -24,7 +24,6 @@ pub struct MicrophoneService {
 
     /// Mute characteristic (required).
     pub mute: MuteCharacteristic,
-
     /// Volume characteristic (optional).
     pub volume: Option<VolumeCharacteristic>,
 }

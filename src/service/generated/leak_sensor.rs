@@ -29,7 +29,6 @@ pub struct LeakSensorService {
 
     /// Leak Detected characteristic (required).
     pub leak_detected: LeakDetectedCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Status Active characteristic (optional).

@@ -30,7 +30,6 @@ pub struct LockMechanismService {
     pub lock_current_state: LockCurrentStateCharacteristic,
     /// Lock Target State characteristic (required).
     pub lock_target_state: LockTargetStateCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
 }

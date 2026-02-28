@@ -14,20 +14,20 @@ use crate::{
 };
 
 // TODO - re-check MaximumDataLength
-/// Token characteristic.
+/// Connection Health Monitor characteristic.
 #[derive(Debug, Default, Serialize)]
-pub struct TokenCharacteristic(Characteristic<Vec<u8>>);
+pub struct ConnectionHealthMonitorCharacteristic(Characteristic<Vec<u8>>);
 
-impl TokenCharacteristic {
-    /// Creates a new Token characteristic.
+impl ConnectionHealthMonitorCharacteristic {
+    /// Creates a new Connection Health Monitor characteristic.
     pub fn new(id: u64, accessory_id: u64) -> Self {
         #[allow(unused_mut)]
         let mut c = Self(Characteristic::<Vec<u8>> {
             id,
             accessory_id,
-            hap_type: HapType::Token,
-            format: Format::Data,
-            perms: vec![Perm::PairedWrite],
+            hap_type: HapType::ConnectionHealthMonitor,
+            format: Format::Tlv8,
+            perms: vec![Perm::Events, Perm::PairedRead, Perm::PairedWrite],
             ..Default::default()
         });
 
@@ -44,7 +44,7 @@ impl TokenCharacteristic {
 }
 
 #[async_trait]
-impl HapCharacteristic for TokenCharacteristic {
+impl HapCharacteristic for ConnectionHealthMonitorCharacteristic {
     fn get_id(&self) -> u64 {
         HapCharacteristic::get_id(&self.0)
     }
@@ -185,13 +185,13 @@ impl HapCharacteristic for TokenCharacteristic {
     }
 }
 
-impl HapCharacteristicSetup for TokenCharacteristic {
+impl HapCharacteristicSetup for ConnectionHealthMonitorCharacteristic {
     fn set_event_emitter(&mut self, event_emitter: Option<pointer::EventEmitter>) {
         HapCharacteristicSetup::set_event_emitter(&mut self.0, event_emitter)
     }
 }
 
-impl CharacteristicCallbacks<Vec<u8>> for TokenCharacteristic {
+impl CharacteristicCallbacks<Vec<u8>> for ConnectionHealthMonitorCharacteristic {
     fn on_read(&mut self, f: Option<impl OnReadFn<Vec<u8>>>) {
         CharacteristicCallbacks::on_read(&mut self.0, f)
     }
@@ -201,7 +201,7 @@ impl CharacteristicCallbacks<Vec<u8>> for TokenCharacteristic {
     }
 }
 
-impl AsyncCharacteristicCallbacks<Vec<u8>> for TokenCharacteristic {
+impl AsyncCharacteristicCallbacks<Vec<u8>> for ConnectionHealthMonitorCharacteristic {
     fn on_read_async(&mut self, f: Option<impl OnReadFuture<Vec<u8>>>) {
         AsyncCharacteristicCallbacks::on_read_async(&mut self.0, f)
     }

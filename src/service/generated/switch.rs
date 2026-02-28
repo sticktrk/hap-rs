@@ -26,7 +26,6 @@ pub struct SwitchService {
 
     /// Power State characteristic (required).
     pub power_state: PowerStateCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
 }

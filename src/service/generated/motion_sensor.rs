@@ -29,7 +29,6 @@ pub struct MotionSensorService {
 
     /// Motion Detected characteristic (required).
     pub motion_detected: MotionDetectedCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Status Active characteristic (optional).

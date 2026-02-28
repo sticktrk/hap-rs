@@ -29,7 +29,6 @@ pub struct SmokeSensorService {
 
     /// Smoke Detected characteristic (required).
     pub smoke_detected: SmokeDetectedCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Status Active characteristic (optional).

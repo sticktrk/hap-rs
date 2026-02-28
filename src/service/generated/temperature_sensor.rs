@@ -29,7 +29,6 @@ pub struct TemperatureSensorService {
 
     /// Current Temperature characteristic (required).
     pub current_temperature: CurrentTemperatureCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Status Active characteristic (optional).

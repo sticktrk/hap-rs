@@ -30,7 +30,6 @@ pub struct WiFiTransportService {
     pub current_transport: CurrentTransportCharacteristic,
     /// Wi-Fi Capabilities characteristic (required).
     pub wi_fi_capabilities: WiFiCapabilitiesCharacteristic,
-
     /// Wi-Fi Configuration Control characteristic (optional).
     pub wi_fi_configuration_control: Option<WiFiConfigurationControlCharacteristic>,
 }

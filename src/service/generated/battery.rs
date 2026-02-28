@@ -28,7 +28,6 @@ pub struct BatteryService {
 
     /// Status Low Battery characteristic (required).
     pub status_low_battery: StatusLowBatteryCharacteristic,
-
     /// Battery Level characteristic (optional).
     pub battery_level: Option<BatteryLevelCharacteristic>,
     /// Charging State characteristic (optional).

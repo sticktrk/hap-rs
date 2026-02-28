@@ -31,7 +31,6 @@ pub struct SiriEndpointService {
     pub siri_endpoint_session_status: SiriEndpointSessionStatusCharacteristic,
     /// Version characteristic (required).
     pub version: VersionCharacteristic,
-
     /// Active Identifier characteristic (optional).
     pub active_identifier: Option<ActiveIdentifierCharacteristic>,
     /// Manually disabled characteristic (optional).

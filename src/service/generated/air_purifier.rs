@@ -34,7 +34,6 @@ pub struct AirPurifierService {
     pub current_air_purifier_state: CurrentAirPurifierStateCharacteristic,
     /// Target Air Purifier State characteristic (required).
     pub target_air_purifier_state: TargetAirPurifierStateCharacteristic,
-
     /// Lock Physical Controls characteristic (optional).
     pub lock_physical_controls: Option<LockPhysicalControlsCharacteristic>,
     /// Name characteristic (optional).

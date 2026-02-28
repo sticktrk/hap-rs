@@ -35,7 +35,6 @@ pub struct AirQualitySensorService {
 
     /// Current Air Quality characteristic (required).
     pub current_air_quality: CurrentAirQualityCharacteristic,
-
     /// Nitrogen dioxide Density characteristic (optional).
     pub nitrogen_dioxide_density: Option<NitrogenDioxideDensityCharacteristic>,
     /// Ozone Density characteristic (optional).

@@ -47,7 +47,6 @@ pub struct ThreadTransportService {
     pub thread_node_capabilities: ThreadNodeCapabilitiesCharacteristic,
     /// Thread Status characteristic (required).
     pub thread_status: ThreadStatusCharacteristic,
-
     /// CCA Energy Detect Threshold characteristic (optional).
     pub cca_energy_detect_threshold: Option<CcaEnergyDetectThresholdCharacteristic>,
     /// CCA Signal Detect Threshold characteristic (optional).

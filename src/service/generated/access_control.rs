@@ -5,6 +5,7 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 use crate::{
     characteristic::{
         access_control_level::AccessControlLevelCharacteristic,
+        media_access_control_level::MediaAccessControlLevelCharacteristic,
         password_setting::PasswordSettingCharacteristic, HapCharacteristic,
     },
     service::HapService,
@@ -27,7 +28,8 @@ pub struct AccessControlService {
 
     /// Access Control Level characteristic (required).
     pub access_control_level: AccessControlLevelCharacteristic,
-
+    /// Media Access Control Level characteristic (optional).
+    pub media_access_control_level: Option<MediaAccessControlLevelCharacteristic>,
     /// Password Setting characteristic (optional).
     pub password_setting: Option<PasswordSettingCharacteristic>,
 }
@@ -39,8 +41,12 @@ impl AccessControlService {
             id,
             hap_type: HapType::AccessControl,
             access_control_level: AccessControlLevelCharacteristic::new(id + 1 + 0, accessory_id),
-            password_setting: Some(PasswordSettingCharacteristic::new(
+            media_access_control_level: Some(MediaAccessControlLevelCharacteristic::new(
                 id + 1 + 0 + 1,
+                accessory_id,
+            )),
+            password_setting: Some(PasswordSettingCharacteristic::new(
+                id + 1 + 1 + 1,
                 accessory_id,
             )),
             ..Default::default()
@@ -110,6 +116,9 @@ impl HapService for AccessControlService {
     fn get_characteristics(&self) -> Vec<&dyn HapCharacteristic> {
         #[allow(unused_mut)]
         let mut characteristics: Vec<&dyn HapCharacteristic> = vec![&self.access_control_level];
+        if let Some(c) = &self.media_access_control_level {
+            characteristics.push(c);
+        }
         if let Some(c) = &self.password_setting {
             characteristics.push(c);
         }
@@ -120,6 +129,9 @@ impl HapService for AccessControlService {
         #[allow(unused_mut)]
         let mut characteristics: Vec<&mut dyn HapCharacteristic> =
             vec![&mut self.access_control_level];
+        if let Some(c) = &mut self.media_access_control_level {
+            characteristics.push(c);
+        }
         if let Some(c) = &mut self.password_setting {
             characteristics.push(c);
         }

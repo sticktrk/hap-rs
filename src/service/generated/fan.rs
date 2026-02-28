@@ -28,7 +28,6 @@ pub struct FanService {
 
     /// Power State characteristic (required).
     pub power_state: PowerStateCharacteristic,
-
     /// Name characteristic (optional).
     pub name: Option<NameCharacteristic>,
     /// Rotation Direction characteristic (optional).

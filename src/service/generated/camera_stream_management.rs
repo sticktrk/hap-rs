@@ -43,7 +43,6 @@ pub struct CameraStreamManagementService {
     pub supported_rtp_configuration: SupportedRtpConfigurationCharacteristic,
     /// Supported Video Stream Configuration characteristic (required).
     pub supported_video_stream_configuration: SupportedVideoStreamConfigurationCharacteristic,
-
     /// Active characteristic (optional).
     pub active: Option<ActiveCharacteristic>,
 }

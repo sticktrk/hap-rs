@@ -32,7 +32,6 @@ pub struct SiriService {
 
     /// Siri Input Type characteristic (required).
     pub siri_input_type: SiriInputTypeCharacteristic,
-
     /// Multifunction Button characteristic (optional).
     pub multifunction_button: Option<MultifunctionButtonCharacteristic>,
     /// Siri Enable characteristic (optional).
