@@ -9,8 +9,7 @@ use crate::{
     characteristic::Perm,
     pointer,
     transport::http::{ReadResponseObject, Status, WriteObject, WriteResponseObject},
-    Error,
-    Result,
+    Error, Result,
 };
 
 /// `AccessoryDatabase` is a wrapper type holding a list of accessories.
@@ -29,7 +28,10 @@ impl AccessoryDatabase {
     }
 
     /// Adds an accessory to the `AccessoryDatabase` and returns a pointer to the added accessory.
-    pub fn add_accessory(&mut self, accessory: Box<dyn HapAccessory>) -> Result<pointer::Accessory> {
+    pub fn add_accessory(
+        &mut self,
+        accessory: Box<dyn HapAccessory>,
+    ) -> Result<pointer::Accessory> {
         let mut accessory = accessory;
         accessory.set_event_emitter_on_characteristics(Some(self.event_emitter.clone()));
 
@@ -156,11 +158,11 @@ impl AccessoryDatabase {
                                     match (ev, pos) {
                                         (true, None) => {
                                             es.push(subscription);
-                                        },
+                                        }
                                         (false, Some(p)) => {
                                             es.remove(p);
-                                        },
-                                        _ => {},
+                                        }
+                                        _ => {}
                                     }
                                 } else {
                                     result_object.status = Status::NotificationNotSupported as i32;

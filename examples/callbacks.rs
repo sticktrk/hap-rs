@@ -5,18 +5,18 @@ use hap::{
     characteristic::CharacteristicCallbacks,
     server::{IpServer, Server},
     storage::{FileStorage, Storage},
-    Config,
-    MacAddress,
-    Pin,
-    Result,
+    Config, MacAddress, Pin, Result,
 };
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let mut lightbulb = LightbulbAccessory::new(1, AccessoryInformation {
-        name: "Acme Lightbulb".into(),
-        ..Default::default()
-    })?;
+    let mut lightbulb = LightbulbAccessory::new(
+        1,
+        AccessoryInformation {
+            name: "Acme Lightbulb".into(),
+            ..Default::default()
+        },
+    )?;
 
     lightbulb.lightbulb.power_state.on_read(Some(|| {
         println!("power_state characteristic read");
@@ -26,7 +26,10 @@ async fn main() -> Result<()> {
         .lightbulb
         .power_state
         .on_update(Some(|current_val: &bool, new_val: &bool| {
-            println!("power_state characteristic updated from {} to {}", current_val, new_val);
+            println!(
+                "power_state characteristic updated from {} to {}",
+                current_val, new_val
+            );
             Ok(())
         }));
 
@@ -37,7 +40,7 @@ async fn main() -> Result<()> {
             config.redetermine_local_ip();
             storage.save_config(&config).await?;
             config
-        },
+        }
         Err(_) => {
             let config = Config {
                 pin: Pin::new([1, 1, 1, 2, 2, 3, 3, 3])?,
@@ -48,7 +51,7 @@ async fn main() -> Result<()> {
             };
             storage.save_config(&config).await?;
             config
-        },
+        }
     };
 
     let server = IpServer::new(config, storage).await?;

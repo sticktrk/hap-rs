@@ -1,4 +1,7 @@
-use chacha20poly1305::{aead::{AeadInPlace, KeyInit}, ChaCha20Poly1305};
+use chacha20poly1305::{
+    aead::{AeadInPlace, KeyInit},
+    ChaCha20Poly1305,
+};
 use futures::{
     channel::oneshot,
     future::{BoxFuture, FutureExt},
@@ -59,9 +62,9 @@ impl TlvHandlerExt for PairVerify {
 
     fn parse(&self, body: Body) -> BoxFuture<'_, Result<Step, tlv::ErrorContainer>> {
         async {
-            let aggregated_body = hyper::body::aggregate(body)
-                .await
-                .map_err(|_| tlv::ErrorContainer::new(StepNumber::Unknown as u8, tlv::Error::Unknown))?;
+            let aggregated_body = hyper::body::aggregate(body).await.map_err(|_| {
+                tlv::ErrorContainer::new(StepNumber::Unknown as u8, tlv::Error::Unknown)
+            })?;
 
             debug!("received body: {:?}", aggregated_body.chunk());
 
@@ -69,26 +72,32 @@ impl TlvHandlerExt for PairVerify {
             match decoded.get(&(Type::State as u8)) {
                 Some(method) => match method[0] {
                     x if x == StepNumber::StartReq as u8 => {
-                        let a_pub = decoded
-                            .remove(&(Type::PublicKey as u8))
-                            .ok_or(tlv::ErrorContainer::new(
+                        let a_pub = decoded.remove(&(Type::PublicKey as u8)).ok_or(
+                            tlv::ErrorContainer::new(
                                 StepNumber::StartRes as u8,
                                 tlv::Error::Unknown,
-                            ))?;
+                            ),
+                        )?;
                         Ok(Step::Start { a_pub })
-                    },
+                    }
                     x if x == StepNumber::FinishReq as u8 => {
-                        let data = decoded
-                            .remove(&(Type::EncryptedData as u8))
-                            .ok_or(tlv::ErrorContainer::new(
+                        let data = decoded.remove(&(Type::EncryptedData as u8)).ok_or(
+                            tlv::ErrorContainer::new(
                                 StepNumber::FinishRes as u8,
                                 tlv::Error::Unknown,
-                            ))?;
+                            ),
+                        )?;
                         Ok(Step::Finish { data })
-                    },
-                    _ => Err(tlv::ErrorContainer::new(StepNumber::Unknown as u8, tlv::Error::Unknown)),
+                    }
+                    _ => Err(tlv::ErrorContainer::new(
+                        StepNumber::Unknown as u8,
+                        tlv::Error::Unknown,
+                    )),
                 },
-                None => Err(tlv::ErrorContainer::new(StepNumber::Unknown as u8, tlv::Error::Unknown)),
+                None => Err(tlv::ErrorContainer::new(
+                    StepNumber::Unknown as u8,
+                    tlv::Error::Unknown,
+                )),
             }
         }
         .boxed()
@@ -172,7 +181,11 @@ async fn handle_start(
 
     let mut encrypted_data = Vec::new();
     encrypted_data.extend_from_slice(&encoded_sub_tlv);
-    let auth_tag = aead.encrypt_in_place_detached(GenericArray::from_slice(&nonce).as_0_14(), &[], &mut encrypted_data)?;
+    let auth_tag = aead.encrypt_in_place_detached(
+        GenericArray::from_slice(&nonce).as_0_14(),
+        &[],
+        &mut encrypted_data,
+    )?;
     encrypted_data.extend(&auth_tag);
 
     info!("pair verify M2: sending verify start response");
@@ -200,7 +213,8 @@ async fn handle_finish(
             let mut nonce = vec![0; 4];
             nonce.extend(b"PV-Msg03");
 
-            let aead = ChaCha20Poly1305::new(GenericArray::from_slice(&session.session_key).as_0_14());
+            let aead =
+                ChaCha20Poly1305::new(GenericArray::from_slice(&session.session_key).as_0_14());
 
             let mut decrypted_data = Vec::new();
             decrypted_data.extend_from_slice(&encrypted_data);
@@ -213,10 +227,15 @@ async fn handle_finish(
 
             let sub_tlv = tlv::decode(&decrypted_data);
             debug!("received sub-TLV: {:?}", &sub_tlv);
-            let device_pairing_id = sub_tlv.get(&(Type::Identifier as u8)).ok_or(tlv::Error::Unknown)?;
+            let device_pairing_id = sub_tlv
+                .get(&(Type::Identifier as u8))
+                .ok_or(tlv::Error::Unknown)?;
             debug!("raw device pairing ID: {:?}", &device_pairing_id);
 
-            let sig = sub_tlv.get(&(Type::Signature as u8)).ok_or(tlv::Error::Unknown)?.as_slice();
+            let sig = sub_tlv
+                .get(&(Type::Signature as u8))
+                .ok_or(tlv::Error::Unknown)?
+                .as_slice();
             let device_signature = ed25519_dalek::Signature::from_slice(&sig)?;
             debug!("device signature: {:?}", &device_signature);
 
@@ -251,6 +270,6 @@ async fn handle_finish(
             info!("pair verify M4: sending verify finish response");
 
             Ok(vec![Value::State(StepNumber::FinishRes as u8)])
-        },
+        }
     }
 }

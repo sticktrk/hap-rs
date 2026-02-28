@@ -14,7 +14,8 @@ pub struct MdnsResponder {
 impl MdnsResponder {
     /// Creates a new mDNS Responder.
     pub async fn new(config: pointer::Config) -> Self {
-        let (responder, task) = libmdns::Responder::with_default_handle().expect("creating mDNS responder");
+        let (responder, task) =
+            libmdns::Responder::with_default_handle().expect("creating mDNS responder");
 
         MdnsResponder {
             config,
@@ -38,24 +39,32 @@ impl MdnsResponder {
 
         drop(c);
 
-        self.service = Some(self.responder.register("_hap._tcp".into(), &name, port, &[
-            &tr[0], &tr[1], &tr[2], &tr[3], &tr[4], &tr[5], &tr[6], &tr[7],
-        ]));
+        self.service = Some(self.responder.register(
+            "_hap._tcp".into(),
+            &name,
+            port,
+            &[
+                &tr[0], &tr[1], &tr[2], &tr[3], &tr[4], &tr[5], &tr[6], &tr[7],
+            ],
+        ));
 
         debug!("setting mDNS records: {:?}", &tr);
     }
 
     /// Returns the mDNS task to throw on a scheduler.
-    pub fn run_handle(&mut self) -> Box<dyn futures::Future<Output = ()> + Unpin + std::marker::Send> {
+    pub fn run_handle(
+        &mut self,
+    ) -> Box<dyn futures::Future<Output = ()> + Unpin + std::marker::Send> {
         match self.task.take() {
             Some(task) => task,
             // if the task handle is gone, recreate the whole responder
             None => {
-                let (responder, task) = libmdns::Responder::with_default_handle().expect("creating mDNS responder");
+                let (responder, task) =
+                    libmdns::Responder::with_default_handle().expect("creating mDNS responder");
                 self.responder = responder;
 
                 task
-            },
+            }
         }
     }
 }

@@ -3,15 +3,15 @@
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use crate::{
-    service::HapService,
     characteristic::{
+        firmware_update_readiness::FirmwareUpdateReadinessCharacteristic,
+        firmware_update_status::FirmwareUpdateStatusCharacteristic,
+        matter_firmware_update_status::MatterFirmwareUpdateStatusCharacteristic,
+        staged_firmware_version::StagedFirmwareVersionCharacteristic,
+        supported_firmware_update_configuration::SupportedFirmwareUpdateConfigurationCharacteristic,
         HapCharacteristic,
-		firmware_update_readiness::FirmwareUpdateReadinessCharacteristic,
-		firmware_update_status::FirmwareUpdateStatusCharacteristic,
-		matter_firmware_update_status::MatterFirmwareUpdateStatusCharacteristic,
-		staged_firmware_version::StagedFirmwareVersionCharacteristic,
-		supported_firmware_update_configuration::SupportedFirmwareUpdateConfigurationCharacteristic,
-	},
+    },
+    service::HapService,
     HapType,
 };
 
@@ -29,17 +29,18 @@ pub struct FirmwareUpdateService {
     /// An array of numbers containing the instance IDs of the services that this service links to.
     linked_services: Vec<u64>,
 
-	/// Firmware Update Readiness characteristic (required).
-	pub firmware_update_readiness: FirmwareUpdateReadinessCharacteristic,
-	/// Firmware Update Status characteristic (required).
-	pub firmware_update_status: FirmwareUpdateStatusCharacteristic,
+    /// Firmware Update Readiness characteristic (required).
+    pub firmware_update_readiness: FirmwareUpdateReadinessCharacteristic,
+    /// Firmware Update Status characteristic (required).
+    pub firmware_update_status: FirmwareUpdateStatusCharacteristic,
 
-	/// Matter Firmware Update Status characteristic (optional).
-	pub matter_firmware_update_status: Option<MatterFirmwareUpdateStatusCharacteristic>,
-	/// Staged Firmware Version characteristic (optional).
-	pub staged_firmware_version: Option<StagedFirmwareVersionCharacteristic>,
-	/// Supported Firmware Update Configuration characteristic (optional).
-	pub supported_firmware_update_configuration: Option<SupportedFirmwareUpdateConfigurationCharacteristic>,
+    /// Matter Firmware Update Status characteristic (optional).
+    pub matter_firmware_update_status: Option<MatterFirmwareUpdateStatusCharacteristic>,
+    /// Staged Firmware Version characteristic (optional).
+    pub staged_firmware_version: Option<StagedFirmwareVersionCharacteristic>,
+    /// Supported Firmware Update Configuration characteristic (optional).
+    pub supported_firmware_update_configuration:
+        Option<SupportedFirmwareUpdateConfigurationCharacteristic>,
 }
 
 impl FirmwareUpdateService {
@@ -48,12 +49,29 @@ impl FirmwareUpdateService {
         Self {
             id,
             hap_type: HapType::FirmwareUpdate,
-			firmware_update_readiness: FirmwareUpdateReadinessCharacteristic::new(id + 1 + 0, accessory_id),
-			firmware_update_status: FirmwareUpdateStatusCharacteristic::new(id + 1 + 1, accessory_id),
-			matter_firmware_update_status: Some(MatterFirmwareUpdateStatusCharacteristic::new(id + 1 + 0 + 2, accessory_id)),
-			staged_firmware_version: Some(StagedFirmwareVersionCharacteristic::new(id + 1 + 1 + 2, accessory_id)),
-			supported_firmware_update_configuration: Some(SupportedFirmwareUpdateConfigurationCharacteristic::new(id + 1 + 2 + 2, accessory_id)),
-			..Default::default()
+            firmware_update_readiness: FirmwareUpdateReadinessCharacteristic::new(
+                id + 1 + 0,
+                accessory_id,
+            ),
+            firmware_update_status: FirmwareUpdateStatusCharacteristic::new(
+                id + 1 + 1,
+                accessory_id,
+            ),
+            matter_firmware_update_status: Some(MatterFirmwareUpdateStatusCharacteristic::new(
+                id + 1 + 0 + 2,
+                accessory_id,
+            )),
+            staged_firmware_version: Some(StagedFirmwareVersionCharacteristic::new(
+                id + 1 + 1 + 2,
+                accessory_id,
+            )),
+            supported_firmware_update_configuration: Some(
+                SupportedFirmwareUpdateConfigurationCharacteristic::new(
+                    id + 1 + 2 + 2,
+                    accessory_id,
+                ),
+            ),
+            ..Default::default()
         }
     }
 }
@@ -120,37 +138,37 @@ impl HapService for FirmwareUpdateService {
     fn get_characteristics(&self) -> Vec<&dyn HapCharacteristic> {
         #[allow(unused_mut)]
         let mut characteristics: Vec<&dyn HapCharacteristic> = vec![
-			&self.firmware_update_readiness,
-			&self.firmware_update_status,
-		];
-		if let Some(c) = &self.matter_firmware_update_status {
-		    characteristics.push(c);
-		}
-		if let Some(c) = &self.staged_firmware_version {
-		    characteristics.push(c);
-		}
-		if let Some(c) = &self.supported_firmware_update_configuration {
-		    characteristics.push(c);
-		}
-		characteristics
+            &self.firmware_update_readiness,
+            &self.firmware_update_status,
+        ];
+        if let Some(c) = &self.matter_firmware_update_status {
+            characteristics.push(c);
+        }
+        if let Some(c) = &self.staged_firmware_version {
+            characteristics.push(c);
+        }
+        if let Some(c) = &self.supported_firmware_update_configuration {
+            characteristics.push(c);
+        }
+        characteristics
     }
 
     fn get_mut_characteristics(&mut self) -> Vec<&mut dyn HapCharacteristic> {
         #[allow(unused_mut)]
         let mut characteristics: Vec<&mut dyn HapCharacteristic> = vec![
-			&mut self.firmware_update_readiness,
-			&mut self.firmware_update_status,
-		];
-		if let Some(c) = &mut self.matter_firmware_update_status {
-		    characteristics.push(c);
-		}
-		if let Some(c) = &mut self.staged_firmware_version {
-		    characteristics.push(c);
-		}
-		if let Some(c) = &mut self.supported_firmware_update_configuration {
-		    characteristics.push(c);
-		}
-		characteristics
+            &mut self.firmware_update_readiness,
+            &mut self.firmware_update_status,
+        ];
+        if let Some(c) = &mut self.matter_firmware_update_status {
+            characteristics.push(c);
+        }
+        if let Some(c) = &mut self.staged_firmware_version {
+            characteristics.push(c);
+        }
+        if let Some(c) = &mut self.supported_firmware_update_configuration {
+            characteristics.push(c);
+        }
+        characteristics
     }
 }
 

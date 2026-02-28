@@ -5,19 +5,18 @@ use hap::{
     serde_json::Value,
     server::{IpServer, Server},
     storage::{FileStorage, Storage},
-    Config,
-    HapType,
-    MacAddress,
-    Pin,
-    Result,
+    Config, HapType, MacAddress, Pin, Result,
 };
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let sensor = MotionSensorAccessory::new(1, AccessoryInformation {
-        name: "Acme Sensor".into(),
-        ..Default::default()
-    })?;
+    let sensor = MotionSensorAccessory::new(
+        1,
+        AccessoryInformation {
+            name: "Acme Sensor".into(),
+            ..Default::default()
+        },
+    )?;
 
     let mut storage = FileStorage::current_dir().await?;
 
@@ -26,7 +25,7 @@ async fn main() -> Result<()> {
             config.redetermine_local_ip();
             storage.save_config(&config).await?;
             config
-        },
+        }
         Err(_) => {
             let config = Config {
                 pin: Pin::new([1, 1, 1, 2, 2, 3, 3, 3])?,
@@ -37,7 +36,7 @@ async fn main() -> Result<()> {
             };
             storage.save_config(&config).await?;
             config
-        },
+        }
     };
 
     let server = IpServer::new(config, storage).await?;
@@ -54,16 +53,22 @@ async fn main() -> Result<()> {
             interval.tick().await;
 
             let mut motion_sensor_accessory = sensor_ptr.lock().await;
-            let motion_sensor_service = motion_sensor_accessory.get_mut_service(HapType::MotionSensor).unwrap();
+            let motion_sensor_service = motion_sensor_accessory
+                .get_mut_service(HapType::MotionSensor)
+                .unwrap();
             let motion_detected_characteristic = motion_sensor_service
                 .get_mut_characteristic(HapType::MotionDetected)
                 .unwrap();
 
-            motion_detected_characteristic.set_value(Value::Bool(true)).await?;
+            motion_detected_characteristic
+                .set_value(Value::Bool(true))
+                .await?;
 
             tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
-            motion_detected_characteristic.set_value(Value::Bool(false)).await?;
+            motion_detected_characteristic
+                .set_value(Value::Bool(false))
+                .await?;
         }
 
         #[allow(unreachable_code)]

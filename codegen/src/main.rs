@@ -148,29 +148,47 @@ impl From<SystemMetadata> for RenderMetadata {
         let mut m = v.plist_dictionary;
 
         // rename mislabeled services
-        let accessory_information_service = m.hap.services.get_mut("accessory-information").unwrap();
+        let accessory_information_service =
+            m.hap.services.get_mut("accessory-information").unwrap();
         accessory_information_service.name = "Accessory Information".to_string();
         let fan_v2_service = m.hap.services.get_mut("fanv2").unwrap();
         fan_v2_service.name = "Fan v2".to_string();
         let smart_speaker_service = m.hap.services.get_mut("smart-speaker").unwrap();
         smart_speaker_service.name = "Smart Speaker".to_string();
 
-        let mut sorted_categories = m.homekit.categories.iter().map(|(_, v)| v.clone()).collect::<Vec<_>>();
+        let mut sorted_categories = m
+            .homekit
+            .categories
+            .iter()
+            .map(|(_, v)| v.clone())
+            .collect::<Vec<_>>();
         sorted_categories.sort_by(|a, b| a.number.partial_cmp(&b.number).unwrap());
 
-        let mut sorted_characteristics = m.hap.characteristics.iter().map(|(_, v)| v.clone()).collect::<Vec<_>>();
+        let mut sorted_characteristics = m
+            .hap
+            .characteristics
+            .iter()
+            .map(|(_, v)| v.clone())
+            .collect::<Vec<_>>();
         sorted_characteristics.sort_by(|a, b| a.name.cmp(&b.name));
 
-        let mut sorted_services = m.hap.services.iter().map(|(_, v)| v.clone()).collect::<Vec<_>>();
+        let mut sorted_services = m
+            .hap
+            .services
+            .iter()
+            .map(|(_, v)| v.clone())
+            .collect::<Vec<_>>();
         sorted_services.sort_by(|a, b| a.name.cmp(&b.name));
 
         let mut characteristic_in_values = HashMap::new();
         let mut characteristic_out_values = HashMap::new();
 
         for (_, characteristic) in m.assistant.characteristics.clone() {
-            if let (Some(read_name), Some(values), &None) =
-                (&characteristic.read, &characteristic.values, &characteristic.out_values)
-            {
+            if let (Some(read_name), Some(values), &None) = (
+                &characteristic.read,
+                &characteristic.values,
+                &characteristic.out_values,
+            ) {
                 characteristic_in_values.insert(read_name.clone(), values.clone());
             }
 
@@ -182,11 +200,14 @@ impl From<SystemMetadata> for RenderMetadata {
                 characteristic_in_values.insert(read_write_name.clone(), values.clone());
             }
 
-            if let (Some(read_name), Some(out_values)) = (characteristic.read, characteristic.out_values) {
+            if let (Some(read_name), Some(out_values)) =
+                (characteristic.read, characteristic.out_values)
+            {
                 characteristic_out_values.insert(read_name, out_values);
             }
 
-            if let (Some(write_name), Some(values)) = (characteristic.write, characteristic.values) {
+            if let (Some(write_name), Some(values)) = (characteristic.write, characteristic.values)
+            {
                 characteristic_in_values.insert(write_name, values);
             }
         }
@@ -215,7 +236,11 @@ fn if_eq_helper<'reg, 'rc>(
 ) -> Result<(), RenderError> {
     let first = h.param(0).unwrap().value();
     let second = h.param(1).unwrap().value();
-    let tmpl = if first == second { h.template() } else { h.inverse() };
+    let tmpl = if first == second {
+        h.template()
+    } else {
+        h.inverse()
+    };
     match tmpl {
         Some(ref t) => t.render(r, c, rc, out),
         None => Ok(()),
@@ -264,40 +289,40 @@ fn type_helper(
         match s {
             "bool" => {
                 out.write("bool")?;
-            },
+            }
             "uint8" => {
                 out.write("u8")?;
-            },
+            }
             "uint16" => {
                 out.write("u16")?;
-            },
+            }
             "uint32" => {
                 out.write("u32")?;
-            },
+            }
             "uint64" => {
                 out.write("u64")?;
-            },
+            }
             "int" => {
                 out.write("i32")?;
-            },
+            }
             "int32" => {
                 out.write("i32")?;
-            },
+            }
             "float" => {
                 out.write("f32")?;
-            },
+            }
             "string" => {
                 out.write("String")?;
-            },
+            }
             "tlv8" => {
                 out.write("Vec<u8>")?;
-            },
+            }
             "data" => {
                 out.write("Vec<u8>")?;
-            },
+            }
             _ => {
                 return Err(RenderError::new("Unknown Characteristic format"));
-            },
+            }
         }
     }
     Ok(())
@@ -315,40 +340,40 @@ fn format_helper(
         match s {
             "bool" => {
                 out.write("Format::Bool")?;
-            },
+            }
             "uint8" => {
                 out.write("Format::UInt8")?;
-            },
+            }
             "uint16" => {
                 out.write("Format::UInt16")?;
-            },
+            }
             "uint32" => {
                 out.write("Format::UInt32")?;
-            },
+            }
             "uint64" => {
                 out.write("Format::UInt64")?;
-            },
+            }
             "int" => {
                 out.write("Format::Int32")?;
-            },
+            }
             "int32" => {
                 out.write("Format::Int32")?;
-            },
+            }
             "float" => {
                 out.write("Format::Float")?;
-            },
+            }
             "string" => {
                 out.write("Format::String")?;
-            },
+            }
             "tlv8" => {
                 out.write("Format::Tlv8")?;
-            },
+            }
             "data" => {
                 out.write("Format::Data")?;
-            },
+            }
             _ => {
                 return Err(RenderError::new("Unknown Characteristic format"));
-            },
+            }
         }
     }
     Ok(())
@@ -366,32 +391,32 @@ fn unit_helper(
         match s {
             "celsius" => {
                 out.write("Unit::Celsius")?;
-            },
+            }
             "fahrenheit" => {
                 out.write("Unit::Celsius")?;
-            },
+            }
             "percentage" => {
                 out.write("Unit::Percentage")?;
-            },
+            }
             "arcdegrees" => {
                 out.write("Unit::ArcDegrees")?;
-            },
+            }
 
             "lux" => {
                 out.write("Unit::Lux")?;
-            },
+            }
             "seconds" => {
                 out.write("Unit::Seconds")?;
-            },
+            }
             "ppm" => {
                 out.write("Unit::PartsPerMillion")?;
-            },
+            }
             "micrograms/m^3" => {
                 out.write("Unit::MicrogramsPerCubicMeter")?;
-            },
+            }
             _ => {
                 return Err(RenderError::new("Unknown Characteristic unit"));
-            },
+            }
         }
     }
     Ok(())
@@ -419,31 +444,33 @@ fn category_helper(
         | "smoke sensor"
         | "temperature sensor" => {
             out.write("AccessoryCategory::Sensor")?;
-        },
+        }
         "doorbell" => {
             out.write("AccessoryCategory::VideoDoorbell")?;
-        },
+        }
         "fan v2" => {
             out.write("AccessoryCategory::Fan")?;
-        },
+        }
         "heater-cooler" => {
             out.write("AccessoryCategory::AirHeater /* or AccessoryCategory::AirConditioner */")?;
-        },
+        }
         "humidifier-dehumidifier" => {
-            out.write("AccessoryCategory::AirHumidifier /* or AccessoryCategory::AirDehumidifier */")?;
-        },
+            out.write(
+                "AccessoryCategory::AirHumidifier /* or AccessoryCategory::AirDehumidifier */",
+            )?;
+        }
         "irrigation-system" => {
             out.write("AccessoryCategory::Sprinkler")?;
-        },
+        }
         "smart speaker" => {
             out.write("AccessoryCategory::Speaker")?;
-        },
+        }
         "stateful programmable switch" | "stateless programmable switch" => {
             out.write("AccessoryCategory::ProgrammableSwitch")?;
-        },
+        }
         "wi-fi satellite" => {
             out.write("AccessoryCategory::WiFiRouter")?;
-        },
+        }
         _ => {
             let param = param.replace("-", " ");
             let name = param
@@ -458,7 +485,7 @@ fn category_helper(
                 .collect::<String>();
             let name = name.replace(" ", "").replace(".", "_");
             out.write(&format!("AccessoryCategory::{}", name))?;
-        },
+        }
     }
 
     Ok(())
@@ -1398,21 +1425,33 @@ fn main() {
     handlebars.register_helper("array_length", Box::new(array_length_helper));
     handlebars.register_helper("snake_case", Box::new(snake_case_helper));
     handlebars.register_helper("pascal_case", Box::new(pascal_case_helper));
-    handlebars.register_template_string("categories", CATEGORIES).unwrap();
-    handlebars.register_template_string("hap_type", HAP_TYPE).unwrap(); // PascalCase camelCase
+    handlebars
+        .register_template_string("categories", CATEGORIES)
+        .unwrap();
+    handlebars
+        .register_template_string("hap_type", HAP_TYPE)
+        .unwrap(); // PascalCase camelCase
     handlebars
         .register_template_string("characteristic", CHARACTERISTIC)
         .unwrap();
     handlebars
         .register_template_string("characteristic_mod", CHARACTERISTIC_MOD)
         .unwrap();
-    handlebars.register_template_string("service", SERVICE).unwrap();
-    handlebars.register_template_string("service_mod", SERVICE_MOD).unwrap();
-    handlebars.register_template_string("accessory", ACCESSORY).unwrap();
+    handlebars
+        .register_template_string("service", SERVICE)
+        .unwrap();
+    handlebars
+        .register_template_string("service_mod", SERVICE_MOD)
+        .unwrap();
+    handlebars
+        .register_template_string("accessory", ACCESSORY)
+        .unwrap();
     handlebars
         .register_template_string("accessory_mod", ACCESSORY_MOD)
         .unwrap();
-    handlebars.register_template_string("example", EXAMPLE).unwrap();
+    handlebars
+        .register_template_string("example", EXAMPLE)
+        .unwrap();
 
     let categories = handlebars.render("categories", &metadata).unwrap();
     let categories_path = "src/accessory/category.rs".to_owned();
@@ -1451,7 +1490,9 @@ fn main() {
         characteristic_path.push_str(&characteristic_file_name);
         characteristic_path.push_str(".rs");
         let mut characteristic_file = File::create(&characteristic_path).unwrap();
-        characteristic_file.write_all(characteristic.as_bytes()).unwrap();
+        characteristic_file
+            .write_all(characteristic.as_bytes())
+            .unwrap();
         characteristic_names.push(json!({ "name": c.name, "file_name": characteristic_file_name }));
     }
     characteristic_names.sort_by(|a, b| {
@@ -1467,7 +1508,8 @@ fn main() {
             &json!({ "characteristics": characteristic_names }),
         )
         .unwrap();
-    let mut characteristic_mod_file = File::create(&format!("{}mod.rs", characteristic_base_path)).unwrap();
+    let mut characteristic_mod_file =
+        File::create(&format!("{}mod.rs", characteristic_base_path)).unwrap();
     characteristic_mod_file
         .write_all(characteristic_mod.as_bytes())
         .unwrap();
@@ -1530,7 +1572,8 @@ fn main() {
         let mut service_file = File::create(&service_path).unwrap();
         service_file.write_all(service.as_bytes()).unwrap();
 
-        service_names.push(json!({ "name": s.name.clone(), "file_name": service_file_name.clone() }));
+        service_names
+            .push(json!({ "name": s.name.clone(), "file_name": service_file_name.clone() }));
 
         if !NON_IDIOMATIC_SERVICES.contains(&s.name.to_lowercase().as_str()) {
             let accessory = handlebars
@@ -1546,7 +1589,9 @@ fn main() {
             accessory_file.write_all(accessory.as_bytes()).unwrap();
 
             if !SKIP_EXAMPLE_GENERATION.contains(&s.name.to_lowercase().as_str()) {
-                let example = handlebars.render("example", &json!({ "service": s })).unwrap();
+                let example = handlebars
+                    .render("example", &json!({ "service": s }))
+                    .unwrap();
                 let mut example_path = String::from("examples/");
                 example_path.push_str(&service_file_name);
                 example_path.push_str(".rs");
@@ -1566,5 +1611,7 @@ fn main() {
         .render("accessory_mod", &json!({ "accessories": accessory_names }))
         .unwrap();
     let mut accessory_mod_file = File::create(&format!("{}mod.rs", accessory_base_path)).unwrap();
-    accessory_mod_file.write_all(accessory_mod.as_bytes()).unwrap();
+    accessory_mod_file
+        .write_all(accessory_mod.as_bytes())
+        .unwrap();
 }

@@ -1,21 +1,21 @@
 use tokio;
 
 use hap::{
-    accessory::{AccessoryCategory, AccessoryInformation, fan_v2::FanV2Accessory},
+    accessory::{fan_v2::FanV2Accessory, AccessoryCategory, AccessoryInformation},
     server::{IpServer, Server},
     storage::{FileStorage, Storage},
-    Config,
-    MacAddress,
-    Pin,
-    Result,
+    Config, MacAddress, Pin, Result,
 };
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let fan_v2 = FanV2Accessory::new(1, AccessoryInformation {
-        name: "Acme Fan v2".into(),
-        ..Default::default()
-    })?;
+    let fan_v2 = FanV2Accessory::new(
+        1,
+        AccessoryInformation {
+            name: "Acme Fan v2".into(),
+            ..Default::default()
+        },
+    )?;
 
     let mut storage = FileStorage::current_dir().await?;
 
@@ -24,7 +24,7 @@ async fn main() -> Result<()> {
             config.redetermine_local_ip();
             storage.save_config(&config).await?;
             config
-        },
+        }
         Err(_) => {
             let config = Config {
                 pin: Pin::new([1, 1, 1, 2, 2, 3, 3, 3])?,
@@ -35,7 +35,7 @@ async fn main() -> Result<()> {
             };
             storage.save_config(&config).await?;
             config
-        },
+        }
     };
 
     let server = IpServer::new(config, storage).await?;

@@ -26,17 +26,13 @@ use crate::{
                 pair_setup::PairSetup,
                 pair_verify::PairVerify,
                 pairings::Pairings,
-                HandlerExt,
-                JsonHandler,
-                TlvHandler,
+                HandlerExt, JsonHandler, TlvHandler,
             },
-            status_response,
-            EventObject,
+            status_response, EventObject,
         },
         tcp::{EncryptedStream, Session, StreamWrapper},
     },
-    Error,
-    Result,
+    Error, Result,
 };
 
 struct Handlers {
@@ -78,10 +74,16 @@ impl Api {
             event_emitter,
             handlers: Handlers {
                 pair_setup: Arc::new(Mutex::new(Box::new(TlvHandler::from(PairSetup::new())))),
-                pair_verify: Arc::new(Mutex::new(Box::new(TlvHandler::from(PairVerify::new(session_sender))))),
+                pair_verify: Arc::new(Mutex::new(Box::new(TlvHandler::from(PairVerify::new(
+                    session_sender,
+                ))))),
                 accessories: Arc::new(Mutex::new(Box::new(JsonHandler::from(Accessories::new())))),
-                get_characteristics: Arc::new(Mutex::new(Box::new(JsonHandler::from(GetCharacteristics::new())))),
-                put_characteristics: Arc::new(Mutex::new(Box::new(JsonHandler::from(UpdateCharacteristics::new())))),
+                get_characteristics: Arc::new(Mutex::new(Box::new(JsonHandler::from(
+                    GetCharacteristics::new(),
+                )))),
+                put_characteristics: Arc::new(Mutex::new(Box::new(JsonHandler::from(
+                    UpdateCharacteristics::new(),
+                )))),
                 pairings: Arc::new(Mutex::new(Box::new(TlvHandler::from(Pairings::new())))),
                 identify: Arc::new(Mutex::new(Box::new(JsonHandler::from(Identify::new())))),
             },
@@ -91,7 +93,8 @@ impl Api {
 
 impl Service<Request<Body>> for Api {
     type Error = Error;
-    type Future = Pin<Box<dyn Future<Output = std::result::Result<Self::Response, Self::Error>> + Send>>;
+    type Future =
+        Pin<Box<dyn Future<Output = std::result::Result<Self::Response, Self::Error>> + Send>>;
     type Response = Response<Body>;
 
     fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<std::result::Result<(), Self::Error>> {
@@ -103,16 +106,21 @@ impl Service<Request<Body>> for Api {
         let method = parts.method;
         let uri = parts.uri;
 
-        let mut handler: Option<Arc<Mutex<Box<dyn HandlerExt + Send + Sync>>>> = match (method, uri.path()) {
-            (Method::POST, "/pair-setup") => Some(self.handlers.pair_setup.clone()),
-            (Method::POST, "/pair-verify") => Some(self.handlers.pair_verify.clone()),
-            (Method::GET, "/accessories") => Some(self.handlers.accessories.clone()),
-            (Method::GET, "/characteristics") => Some(self.handlers.get_characteristics.clone()),
-            (Method::PUT, "/characteristics") => Some(self.handlers.put_characteristics.clone()),
-            (Method::POST, "/pairings") => Some(self.handlers.pairings.clone()),
-            (Method::POST, "/identify") => Some(self.handlers.identify.clone()),
-            _ => None,
-        };
+        let mut handler: Option<Arc<Mutex<Box<dyn HandlerExt + Send + Sync>>>> =
+            match (method, uri.path()) {
+                (Method::POST, "/pair-setup") => Some(self.handlers.pair_setup.clone()),
+                (Method::POST, "/pair-verify") => Some(self.handlers.pair_verify.clone()),
+                (Method::GET, "/accessories") => Some(self.handlers.accessories.clone()),
+                (Method::GET, "/characteristics") => {
+                    Some(self.handlers.get_characteristics.clone())
+                }
+                (Method::PUT, "/characteristics") => {
+                    Some(self.handlers.put_characteristics.clone())
+                }
+                (Method::POST, "/pairings") => Some(self.handlers.pairings.clone()),
+                (Method::POST, "/identify") => Some(self.handlers.identify.clone()),
+                _ => None,
+            };
 
         let controller_id = self.controller_id.clone();
         let event_subscriptions = self.event_subscriptions.clone();
@@ -123,7 +131,7 @@ impl Service<Request<Body>> for Api {
 
         let fut = async move {
             match handler.take() {
-                Some(handler) =>
+                Some(handler) => {
                     handler
                         .lock()
                         .await
@@ -137,7 +145,8 @@ impl Service<Request<Body>> for Api {
                             accessory_database,
                             event_emitter,
                         )
-                        .await,
+                        .await
+                }
                 None => future::ready(status_response(StatusCode::NOT_FOUND)).await,
             }
         }
@@ -203,8 +212,12 @@ impl Server {
                     incoming_waker,
                     outgoing_waker,
                 ) = EncryptedStream::new(stream);
-                let stream_wrapper =
-                    StreamWrapper::new(stream_incoming, stream_outgoing.clone(), incoming_waker, outgoing_waker);
+                let stream_wrapper = StreamWrapper::new(
+                    stream_incoming,
+                    stream_outgoing.clone(),
+                    incoming_waker,
+                    outgoing_waker,
+                );
                 let event_subscriptions = Arc::new(Mutex::new(vec![]));
 
                 let api = Api::new(
@@ -217,37 +230,46 @@ impl Server {
                     session_sender,
                 );
 
-                event_emitter.lock().await.add_listener(Box::new(move |event| {
-                    let event_subscriptions_ = event_subscriptions.clone();
-                    let stream_outgoing_ = stream_outgoing.clone();
-                    async move {
-                        match *event {
-                            Event::CharacteristicValueChanged { aid, iid, ref value } => {
-                                let mut dropped_subscriptions = vec![];
-                                for (i, &(s_aid, s_iid)) in event_subscriptions_.lock().await.iter().enumerate() {
-                                    if s_aid == aid && s_iid == iid {
-                                        let event = EventObject {
-                                            aid,
-                                            iid,
-                                            value: value.clone(),
-                                        };
-                                        let event_res =
-                                            event_response(vec![event]).expect("couldn't create event response");
-                                        if stream_outgoing_.unbounded_send(event_res).is_err() {
-                                            dropped_subscriptions.push(i);
+                event_emitter
+                    .lock()
+                    .await
+                    .add_listener(Box::new(move |event| {
+                        let event_subscriptions_ = event_subscriptions.clone();
+                        let stream_outgoing_ = stream_outgoing.clone();
+                        async move {
+                            match *event {
+                                Event::CharacteristicValueChanged {
+                                    aid,
+                                    iid,
+                                    ref value,
+                                } => {
+                                    let mut dropped_subscriptions = vec![];
+                                    for (i, &(s_aid, s_iid)) in
+                                        event_subscriptions_.lock().await.iter().enumerate()
+                                    {
+                                        if s_aid == aid && s_iid == iid {
+                                            let event = EventObject {
+                                                aid,
+                                                iid,
+                                                value: value.clone(),
+                                            };
+                                            let event_res = event_response(vec![event])
+                                                .expect("couldn't create event response");
+                                            if stream_outgoing_.unbounded_send(event_res).is_err() {
+                                                dropped_subscriptions.push(i);
+                                            }
                                         }
                                     }
+                                    let mut ev = event_subscriptions_.lock().await;
+                                    for s in dropped_subscriptions {
+                                        ev.remove(s);
+                                    }
                                 }
-                                let mut ev = event_subscriptions_.lock().await;
-                                for s in dropped_subscriptions {
-                                    ev.remove(s);
-                                }
-                            },
-                            _ => {},
+                                _ => {}
+                            }
                         }
-                    }
-                    .boxed()
-                }));
+                        .boxed()
+                    }));
 
                 let mut http = Http::new();
                 http.http1_only(true);

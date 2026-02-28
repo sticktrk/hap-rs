@@ -14,8 +14,7 @@ use crate::{
     server::Server,
     storage::{accessory_database::AccessoryDatabase, Storage},
     transport::{http::server::Server as HttpServer, mdns::MdnsResponder},
-    BonjourStatusFlag,
-    Result,
+    BonjourStatusFlag, Result,
 };
 
 /// HAP Server via TCP/IP.
@@ -85,7 +84,10 @@ impl IpServer {
     ///     handle.await
     /// }
     /// ```
-    pub async fn new<S: Storage + Send + Sync + 'static>(config: Config, storage: S) -> Result<Self> {
+    pub async fn new<S: Storage + Send + Sync + 'static>(
+        config: Config,
+        storage: S,
+    ) -> Result<Self> {
         let config = Arc::new(Mutex::new(config));
         let storage: pointer::Storage = Arc::new(Mutex::new(Box::new(storage)));
 
@@ -178,7 +180,8 @@ impl IpServer {
         }));
 
         let event_emitter = Arc::new(Mutex::new(event_emitter));
-        let accessory_database = Arc::new(Mutex::new(AccessoryDatabase::new(event_emitter.clone())));
+        let accessory_database =
+            Arc::new(Mutex::new(AccessoryDatabase::new(event_emitter.clone())));
 
         let http_server = HttpServer::new(
             config.clone(),
@@ -196,7 +199,7 @@ impl IpServer {
                 let aid_cache = Vec::new();
                 storage_lock.save_aid_cache(&aid_cache).await?;
                 aid_cache
-            },
+            }
         }));
         drop(storage_lock);
 
@@ -231,11 +234,18 @@ impl Server for IpServer {
         Box::pin(handle)
     }
 
-    fn config_pointer(&self) -> pointer::Config { self.config.clone() }
+    fn config_pointer(&self) -> pointer::Config {
+        self.config.clone()
+    }
 
-    fn storage_pointer(&self) -> pointer::Storage { self.storage.clone() }
+    fn storage_pointer(&self) -> pointer::Storage {
+        self.storage.clone()
+    }
 
-    async fn add_accessory<A: HapAccessory + 'static>(&self, accessory: A) -> Result<pointer::Accessory> {
+    async fn add_accessory<A: HapAccessory + 'static>(
+        &self,
+        accessory: A,
+    ) -> Result<pointer::Accessory> {
         let aid = accessory.get_id();
 
         let accessory = self

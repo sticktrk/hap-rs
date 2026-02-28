@@ -1,21 +1,24 @@
 use tokio;
 
 use hap::{
-    accessory::{AccessoryCategory, AccessoryInformation, stateful_programmable_switch::StatefulProgrammableSwitchAccessory},
+    accessory::{
+        stateful_programmable_switch::StatefulProgrammableSwitchAccessory, AccessoryCategory,
+        AccessoryInformation,
+    },
     server::{IpServer, Server},
     storage::{FileStorage, Storage},
-    Config,
-    MacAddress,
-    Pin,
-    Result,
+    Config, MacAddress, Pin, Result,
 };
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let stateful_programmable_switch = StatefulProgrammableSwitchAccessory::new(1, AccessoryInformation {
-        name: "Acme Stateful Programmable Switch".into(),
-        ..Default::default()
-    })?;
+    let stateful_programmable_switch = StatefulProgrammableSwitchAccessory::new(
+        1,
+        AccessoryInformation {
+            name: "Acme Stateful Programmable Switch".into(),
+            ..Default::default()
+        },
+    )?;
 
     let mut storage = FileStorage::current_dir().await?;
 
@@ -24,7 +27,7 @@ async fn main() -> Result<()> {
             config.redetermine_local_ip();
             storage.save_config(&config).await?;
             config
-        },
+        }
         Err(_) => {
             let config = Config {
                 pin: Pin::new([1, 1, 1, 2, 2, 3, 3, 3])?,
@@ -35,7 +38,7 @@ async fn main() -> Result<()> {
             };
             storage.save_config(&config).await?;
             config
-        },
+        }
     };
 
     let server = IpServer::new(config, storage).await?;

@@ -3,13 +3,12 @@
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use crate::{
-    service::HapService,
     characteristic::{
-        HapCharacteristic,
-		active::ActiveCharacteristic,
-		metrics_buffer_full_state::MetricsBufferFullStateCharacteristic,
-		supported_metrics::SupportedMetricsCharacteristic,
-	},
+        active::ActiveCharacteristic,
+        metrics_buffer_full_state::MetricsBufferFullStateCharacteristic,
+        supported_metrics::SupportedMetricsCharacteristic, HapCharacteristic,
+    },
+    service::HapService,
     HapType,
 };
 
@@ -27,13 +26,12 @@ pub struct AccessoryMetricsService {
     /// An array of numbers containing the instance IDs of the services that this service links to.
     linked_services: Vec<u64>,
 
-	/// Active characteristic (required).
-	pub active: ActiveCharacteristic,
-	/// Metrics Buffer Full State characteristic (required).
-	pub metrics_buffer_full_state: MetricsBufferFullStateCharacteristic,
-	/// Supported Metrics characteristic (required).
-	pub supported_metrics: SupportedMetricsCharacteristic,
-
+    /// Active characteristic (required).
+    pub active: ActiveCharacteristic,
+    /// Metrics Buffer Full State characteristic (required).
+    pub metrics_buffer_full_state: MetricsBufferFullStateCharacteristic,
+    /// Supported Metrics characteristic (required).
+    pub supported_metrics: SupportedMetricsCharacteristic,
 }
 
 impl AccessoryMetricsService {
@@ -42,10 +40,13 @@ impl AccessoryMetricsService {
         Self {
             id,
             hap_type: HapType::AccessoryMetrics,
-			active: ActiveCharacteristic::new(id + 1 + 0, accessory_id),
-			metrics_buffer_full_state: MetricsBufferFullStateCharacteristic::new(id + 1 + 1, accessory_id),
-			supported_metrics: SupportedMetricsCharacteristic::new(id + 1 + 2, accessory_id),
-			..Default::default()
+            active: ActiveCharacteristic::new(id + 1 + 0, accessory_id),
+            metrics_buffer_full_state: MetricsBufferFullStateCharacteristic::new(
+                id + 1 + 1,
+                accessory_id,
+            ),
+            supported_metrics: SupportedMetricsCharacteristic::new(id + 1 + 2, accessory_id),
+            ..Default::default()
         }
     }
 }
@@ -112,21 +113,21 @@ impl HapService for AccessoryMetricsService {
     fn get_characteristics(&self) -> Vec<&dyn HapCharacteristic> {
         #[allow(unused_mut)]
         let mut characteristics: Vec<&dyn HapCharacteristic> = vec![
-			&self.active,
-			&self.metrics_buffer_full_state,
-			&self.supported_metrics,
-		];
-		characteristics
+            &self.active,
+            &self.metrics_buffer_full_state,
+            &self.supported_metrics,
+        ];
+        characteristics
     }
 
     fn get_mut_characteristics(&mut self) -> Vec<&mut dyn HapCharacteristic> {
         #[allow(unused_mut)]
         let mut characteristics: Vec<&mut dyn HapCharacteristic> = vec![
-			&mut self.active,
-			&mut self.metrics_buffer_full_state,
-			&mut self.supported_metrics,
-		];
-		characteristics
+            &mut self.active,
+            &mut self.metrics_buffer_full_state,
+            &mut self.supported_metrics,
+        ];
+        characteristics
     }
 }
 

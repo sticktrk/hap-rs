@@ -3,13 +3,12 @@
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use crate::{
-    service::HapService,
     characteristic::{
-        HapCharacteristic,
-		wake_configuration::WakeConfigurationCharacteristic,
-		selected_sleep_configuration::SelectedSleepConfigurationCharacteristic,
-		supported_sleep_configuration::SupportedSleepConfigurationCharacteristic,
-	},
+        selected_sleep_configuration::SelectedSleepConfigurationCharacteristic,
+        supported_sleep_configuration::SupportedSleepConfigurationCharacteristic,
+        wake_configuration::WakeConfigurationCharacteristic, HapCharacteristic,
+    },
+    service::HapService,
     HapType,
 };
 
@@ -27,13 +26,13 @@ pub struct PowerManagementService {
     /// An array of numbers containing the instance IDs of the services that this service links to.
     linked_services: Vec<u64>,
 
-	/// Wake Configuration characteristic (required).
-	pub wake_configuration: WakeConfigurationCharacteristic,
+    /// Wake Configuration characteristic (required).
+    pub wake_configuration: WakeConfigurationCharacteristic,
 
-	/// Selected Sleep Configuration characteristic (optional).
-	pub selected_sleep_configuration: Option<SelectedSleepConfigurationCharacteristic>,
-	/// Supported Sleep Configuration characteristic (optional).
-	pub supported_sleep_configuration: Option<SupportedSleepConfigurationCharacteristic>,
+    /// Selected Sleep Configuration characteristic (optional).
+    pub selected_sleep_configuration: Option<SelectedSleepConfigurationCharacteristic>,
+    /// Supported Sleep Configuration characteristic (optional).
+    pub supported_sleep_configuration: Option<SupportedSleepConfigurationCharacteristic>,
 }
 
 impl PowerManagementService {
@@ -42,10 +41,16 @@ impl PowerManagementService {
         Self {
             id,
             hap_type: HapType::PowerManagement,
-			wake_configuration: WakeConfigurationCharacteristic::new(id + 1 + 0, accessory_id),
-			selected_sleep_configuration: Some(SelectedSleepConfigurationCharacteristic::new(id + 1 + 0 + 1, accessory_id)),
-			supported_sleep_configuration: Some(SupportedSleepConfigurationCharacteristic::new(id + 1 + 1 + 1, accessory_id)),
-			..Default::default()
+            wake_configuration: WakeConfigurationCharacteristic::new(id + 1 + 0, accessory_id),
+            selected_sleep_configuration: Some(SelectedSleepConfigurationCharacteristic::new(
+                id + 1 + 0 + 1,
+                accessory_id,
+            )),
+            supported_sleep_configuration: Some(SupportedSleepConfigurationCharacteristic::new(
+                id + 1 + 1 + 1,
+                accessory_id,
+            )),
+            ..Default::default()
         }
     }
 }
@@ -111,30 +116,27 @@ impl HapService for PowerManagementService {
 
     fn get_characteristics(&self) -> Vec<&dyn HapCharacteristic> {
         #[allow(unused_mut)]
-        let mut characteristics: Vec<&dyn HapCharacteristic> = vec![
-			&self.wake_configuration,
-		];
-		if let Some(c) = &self.selected_sleep_configuration {
-		    characteristics.push(c);
-		}
-		if let Some(c) = &self.supported_sleep_configuration {
-		    characteristics.push(c);
-		}
-		characteristics
+        let mut characteristics: Vec<&dyn HapCharacteristic> = vec![&self.wake_configuration];
+        if let Some(c) = &self.selected_sleep_configuration {
+            characteristics.push(c);
+        }
+        if let Some(c) = &self.supported_sleep_configuration {
+            characteristics.push(c);
+        }
+        characteristics
     }
 
     fn get_mut_characteristics(&mut self) -> Vec<&mut dyn HapCharacteristic> {
         #[allow(unused_mut)]
-        let mut characteristics: Vec<&mut dyn HapCharacteristic> = vec![
-			&mut self.wake_configuration,
-		];
-		if let Some(c) = &mut self.selected_sleep_configuration {
-		    characteristics.push(c);
-		}
-		if let Some(c) = &mut self.supported_sleep_configuration {
-		    characteristics.push(c);
-		}
-		characteristics
+        let mut characteristics: Vec<&mut dyn HapCharacteristic> =
+            vec![&mut self.wake_configuration];
+        if let Some(c) = &mut self.selected_sleep_configuration {
+            characteristics.push(c);
+        }
+        if let Some(c) = &mut self.supported_sleep_configuration {
+            characteristics.push(c);
+        }
+        characteristics
     }
 }
 

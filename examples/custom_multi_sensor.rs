@@ -8,17 +8,11 @@ use hap::{
     accessory::{AccessoryCategory, AccessoryInformation, HapAccessory},
     server::{IpServer, Server},
     service::{
-        accessory_information::AccessoryInformationService,
-        humidity_sensor::HumiditySensorService,
-        temperature_sensor::TemperatureSensorService,
-        HapService,
+        accessory_information::AccessoryInformationService, humidity_sensor::HumiditySensorService,
+        temperature_sensor::TemperatureSensorService, HapService,
     },
     storage::{FileStorage, Storage},
-    Config,
-    HapType,
-    MacAddress,
-    Pin,
-    Result,
+    Config, HapType, MacAddress, Pin, Result,
 };
 
 /// Multi Sensor accessory.
@@ -36,9 +30,13 @@ pub struct MultiSensorAccessory {
 }
 
 impl HapAccessory for MultiSensorAccessory {
-    fn get_id(&self) -> u64 { self.id }
+    fn get_id(&self) -> u64 {
+        self.id
+    }
 
-    fn set_id(&mut self, id: u64) { self.id = id; }
+    fn set_id(&mut self, id: u64) {
+        self.id = id;
+    }
 
     fn get_service(&self, hap_type: HapType) -> Option<&dyn HapService> {
         for service in self.get_services() {
@@ -106,7 +104,7 @@ async fn main() -> Result<()> {
             config.redetermine_local_ip();
             storage.save_config(&config).await?;
             config
-        },
+        }
         Err(_) => {
             let config = Config {
                 pin: Pin::new([1, 1, 1, 2, 2, 3, 3, 3])?,
@@ -117,7 +115,7 @@ async fn main() -> Result<()> {
             };
             storage.save_config(&config).await?;
             config
-        },
+        }
     };
 
     let server = IpServer::new(config, storage).await?;

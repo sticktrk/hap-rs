@@ -1,11 +1,11 @@
 use ed25519_dalek::{SecretKey, SigningKey as Ed25519Keypair};
 //use eui48::MacAddress;
+use crate::{accessory::AccessoryCategory, BonjourFeatureFlag, BonjourStatusFlag, Pin};
 use macaddr::MacAddr6 as MacAddress;
 use rand::{rand_core, random, rngs::OsRng};
+use rand_core::TryRngCore;
 use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
-use rand_core::{TryRngCore};
-use crate::{accessory::AccessoryCategory, BonjourFeatureFlag, BonjourStatusFlag, Pin};
 
 /// The `Config` struct is used to store configuration options for the HomeKit Accessory Server.
 ///
@@ -72,7 +72,9 @@ pub struct Config {
 
 impl Config {
     /// Redetermines the `host` field to the IP of the system's first non-loopback network interface.
-    pub fn redetermine_local_ip(&mut self) { self.host = get_local_ip(); }
+    pub fn redetermine_local_ip(&mut self) {
+        self.host = get_local_ip();
+    }
 
     /// Derives mDNS TXT records from the `Config`.
     pub(crate) fn txt_records(&self) -> [String; 8] {
@@ -112,7 +114,7 @@ impl Default for Config {
 
 /// Generates a random MAC address.
 fn generate_random_mac_address() -> MacAddress {
-    let eui : [u8; 6] = random::<[u8; 6]>().into();
+    let eui: [u8; 6] = random::<[u8; 6]>().into();
     MacAddress::from(eui)
 }
 

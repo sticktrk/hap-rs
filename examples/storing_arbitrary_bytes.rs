@@ -8,10 +8,7 @@ use hap::{
     futures::future::FutureExt,
     server::{IpServer, Server},
     storage::{FileStorage, Storage},
-    Config,
-    MacAddress,
-    Pin,
-    Result,
+    Config, MacAddress, Pin, Result,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -21,10 +18,13 @@ struct LightbulbState {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let mut lightbulb = LightbulbAccessory::new(1, AccessoryInformation {
-        name: "Acme Stateful Lightbulb".into(),
-        ..Default::default()
-    })?;
+    let mut lightbulb = LightbulbAccessory::new(
+        1,
+        AccessoryInformation {
+            name: "Acme Stateful Lightbulb".into(),
+            ..Default::default()
+        },
+    )?;
 
     let mut storage = FileStorage::current_dir().await?;
 
@@ -33,7 +33,7 @@ async fn main() -> Result<()> {
             config.redetermine_local_ip();
             storage.save_config(&config).await?;
             config
-        },
+        }
         Err(_) => {
             let config = Config {
                 pin: Pin::new([1, 1, 1, 2, 2, 3, 3, 3])?,
@@ -44,20 +44,20 @@ async fn main() -> Result<()> {
             };
             storage.save_config(&config).await?;
             config
-        },
+        }
     };
 
     let state = Arc::new(Mutex::new(match storage.load_bytes("state.json").await {
         Ok(state_bytes) => {
             let state = serde_json::from_slice(&state_bytes)?;
             state
-        },
+        }
         Err(_) => {
             let state = LightbulbState { power_state: false };
             let state_bytes = serde_json::to_vec(&state)?;
             storage.save_bytes("state.json", &state_bytes).await?;
             state
-        },
+        }
     }));
 
     let state_ = state.clone();
@@ -66,7 +66,10 @@ async fn main() -> Result<()> {
         async move {
             let power_state = state.lock().await.power_state;
 
-            println!("power_state characteristic read from state: {}", &power_state);
+            println!(
+                "power_state characteristic read from state: {}",
+                &power_state
+            );
 
             // have the controller read the value from state
             Ok(Some(power_state))
@@ -78,10 +81,8 @@ async fn main() -> Result<()> {
     let state_storage = Arc::new(Mutex::new(FileStorage::current_dir().await?));
     let state_ = state.clone();
     let state_storage_ = state_storage.clone();
-    lightbulb
-        .lightbulb
-        .power_state
-        .on_update_async(Some(move |current_val: bool, new_val: bool| {
+    lightbulb.lightbulb.power_state.on_update_async(Some(
+        move |current_val: bool, new_val: bool| {
             let state = state_.clone();
             let storage = state_storage_.clone();
             async move {
@@ -91,15 +92,23 @@ async fn main() -> Result<()> {
 
                     // persist the new value
                     let state_bytes = serde_json::to_vec(&*s)?;
-                    storage.lock().await.save_bytes("state.json", &state_bytes).await?;
+                    storage
+                        .lock()
+                        .await
+                        .save_bytes("state.json", &state_bytes)
+                        .await?;
                 }
 
-                println!("power_state characteristic updated from {} to {}", current_val, new_val);
+                println!(
+                    "power_state characteristic updated from {} to {}",
+                    current_val, new_val
+                );
 
                 Ok(())
             }
             .boxed()
-        }));
+        },
+    ));
 
     let server = IpServer::new(config, storage).await?;
     server.add_accessory(lightbulb).await?;

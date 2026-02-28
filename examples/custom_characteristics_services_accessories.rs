@@ -11,11 +11,7 @@ use hap::{
     server::{IpServer, Server},
     service::{accessory_information::AccessoryInformationService, HapService},
     storage::{FileStorage, Storage},
-    Config,
-    HapType,
-    MacAddress,
-    Pin,
-    Result,
+    Config, HapType, MacAddress, Pin, Result,
 };
 
 // creating a custom service
@@ -41,25 +37,45 @@ pub struct FooService {
 }
 
 impl HapService for FooService {
-    fn get_id(&self) -> u64 { self.id }
+    fn get_id(&self) -> u64 {
+        self.id
+    }
 
-    fn set_id(&mut self, id: u64) { self.id = id; }
+    fn set_id(&mut self, id: u64) {
+        self.id = id;
+    }
 
-    fn get_type(&self) -> HapType { self.hap_type }
+    fn get_type(&self) -> HapType {
+        self.hap_type
+    }
 
-    fn set_type(&mut self, hap_type: HapType) { self.hap_type = hap_type; }
+    fn set_type(&mut self, hap_type: HapType) {
+        self.hap_type = hap_type;
+    }
 
-    fn get_hidden(&self) -> bool { self.hidden }
+    fn get_hidden(&self) -> bool {
+        self.hidden
+    }
 
-    fn set_hidden(&mut self, hidden: bool) { self.hidden = hidden; }
+    fn set_hidden(&mut self, hidden: bool) {
+        self.hidden = hidden;
+    }
 
-    fn get_primary(&self) -> bool { self.primary }
+    fn get_primary(&self) -> bool {
+        self.primary
+    }
 
-    fn set_primary(&mut self, primary: bool) { self.primary = primary; }
+    fn set_primary(&mut self, primary: bool) {
+        self.primary = primary;
+    }
 
-    fn get_linked_services(&self) -> Vec<u64> { self.linked_services.clone() }
+    fn get_linked_services(&self) -> Vec<u64> {
+        self.linked_services.clone()
+    }
 
-    fn set_linked_services(&mut self, linked_services: Vec<u64>) { self.linked_services = linked_services; }
+    fn set_linked_services(&mut self, linked_services: Vec<u64>) {
+        self.linked_services = linked_services;
+    }
 
     fn get_characteristic(&self, hap_type: HapType) -> Option<&dyn HapCharacteristic> {
         for characteristic in self.get_characteristics() {
@@ -79,7 +95,9 @@ impl HapService for FooService {
         None
     }
 
-    fn get_characteristics(&self) -> Vec<&dyn HapCharacteristic> { vec![&self.foo_number, &self.foo_name] }
+    fn get_characteristics(&self) -> Vec<&dyn HapCharacteristic> {
+        vec![&self.foo_number, &self.foo_name]
+    }
 
     fn get_mut_characteristics(&mut self) -> Vec<&mut dyn HapCharacteristic> {
         vec![&mut self.foo_number, &mut self.foo_name]
@@ -114,9 +132,13 @@ pub struct FooAccessory {
 }
 
 impl HapAccessory for FooAccessory {
-    fn get_id(&self) -> u64 { self.id }
+    fn get_id(&self) -> u64 {
+        self.id
+    }
 
-    fn set_id(&mut self, id: u64) { self.id = id; }
+    fn set_id(&mut self, id: u64) {
+        self.id = id;
+    }
 
     fn get_service(&self, hap_type: HapType) -> Option<&dyn HapService> {
         for service in self.get_services() {
@@ -136,9 +158,13 @@ impl HapAccessory for FooAccessory {
         None
     }
 
-    fn get_services(&self) -> Vec<&dyn HapService> { vec![&self.accessory_information, &self.foo] }
+    fn get_services(&self) -> Vec<&dyn HapService> {
+        vec![&self.accessory_information, &self.foo]
+    }
 
-    fn get_mut_services(&mut self) -> Vec<&mut dyn HapService> { vec![&mut self.accessory_information, &mut self.foo] }
+    fn get_mut_services(&mut self) -> Vec<&mut dyn HapService> {
+        vec![&mut self.accessory_information, &mut self.foo]
+    }
 }
 
 impl Serialize for FooAccessory {
@@ -235,7 +261,7 @@ async fn main() -> Result<()> {
             config.redetermine_local_ip();
             storage.save_config(&config).await?;
             config
-        },
+        }
         Err(_) => {
             let config = Config {
                 pin: Pin::new([1, 1, 1, 2, 2, 3, 3, 3])?,
@@ -246,7 +272,7 @@ async fn main() -> Result<()> {
             };
             storage.save_config(&config).await?;
             config
-        },
+        }
     };
 
     let server = IpServer::new(config, storage).await?;

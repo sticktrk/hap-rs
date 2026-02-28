@@ -6,18 +6,18 @@ use hap::{
     futures::future::FutureExt,
     server::{IpServer, Server},
     storage::{FileStorage, Storage},
-    Config,
-    MacAddress,
-    Pin,
-    Result,
+    Config, MacAddress, Pin, Result,
 };
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let mut lightbulb = LightbulbAccessory::new(1, AccessoryInformation {
-        name: "Acme Lightbulb".into(),
-        ..Default::default()
-    })?;
+    let mut lightbulb = LightbulbAccessory::new(
+        1,
+        AccessoryInformation {
+            name: "Acme Lightbulb".into(),
+            ..Default::default()
+        },
+    )?;
 
     lightbulb.lightbulb.power_state.on_read_async(Some(|| {
         async {
@@ -31,7 +31,10 @@ async fn main() -> Result<()> {
         .power_state
         .on_update_async(Some(|current_val: bool, new_val: bool| {
             async move {
-                println!("power_state characteristic updated from {} to {}", current_val, new_val);
+                println!(
+                    "power_state characteristic updated from {} to {}",
+                    current_val, new_val
+                );
                 Ok(())
             }
             .boxed()
@@ -44,7 +47,7 @@ async fn main() -> Result<()> {
             config.redetermine_local_ip();
             storage.save_config(&config).await?;
             config
-        },
+        }
         Err(_) => {
             let config = Config {
                 pin: Pin::new([1, 1, 1, 2, 2, 3, 3, 3])?,
@@ -55,7 +58,7 @@ async fn main() -> Result<()> {
             };
             storage.save_config(&config).await?;
             config
-        },
+        }
     };
 
     let server = IpServer::new(config, storage).await?;

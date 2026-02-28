@@ -1,25 +1,31 @@
 use tokio;
 
 use hap::{
-    accessory::{bridge::BridgeAccessory, lightbulb::LightbulbAccessory, AccessoryCategory, AccessoryInformation},
+    accessory::{
+        bridge::BridgeAccessory, lightbulb::LightbulbAccessory, AccessoryCategory,
+        AccessoryInformation,
+    },
     server::{IpServer, Server},
     storage::{FileStorage, Storage},
-    Config,
-    MacAddress,
-    Pin,
-    Result,
+    Config, MacAddress, Pin, Result,
 };
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let bridge = BridgeAccessory::new(1, AccessoryInformation {
-        name: "Acme Bridge".into(),
-        ..Default::default()
-    })?;
-    let lightbulb = LightbulbAccessory::new(2, AccessoryInformation {
-        name: "Acme Lightbulb".into(),
-        ..Default::default()
-    })?;
+    let bridge = BridgeAccessory::new(
+        1,
+        AccessoryInformation {
+            name: "Acme Bridge".into(),
+            ..Default::default()
+        },
+    )?;
+    let lightbulb = LightbulbAccessory::new(
+        2,
+        AccessoryInformation {
+            name: "Acme Lightbulb".into(),
+            ..Default::default()
+        },
+    )?;
 
     let mut storage = FileStorage::current_dir().await?;
 
@@ -28,7 +34,7 @@ async fn main() -> Result<()> {
             config.redetermine_local_ip();
             storage.save_config(&config).await?;
             config
-        },
+        }
         Err(_) => {
             let config = Config {
                 pin: Pin::new([1, 1, 1, 2, 2, 3, 3, 3])?,
@@ -39,7 +45,7 @@ async fn main() -> Result<()> {
             };
             storage.save_config(&config).await?;
             config
-        },
+        }
     };
 
     let server = IpServer::new(config, storage).await?;
@@ -52,10 +58,13 @@ async fn main() -> Result<()> {
         tokio::time::sleep(std::time::Duration::from_secs(60)).await;
 
         for i in 0..20 {
-            let lightbulb = LightbulbAccessory::new(i + 3, AccessoryInformation {
-                name: format!("Another Lightbulb {}", i + 1),
-                ..Default::default()
-            })?;
+            let lightbulb = LightbulbAccessory::new(
+                i + 3,
+                AccessoryInformation {
+                    name: format!("Another Lightbulb {}", i + 1),
+                    ..Default::default()
+                },
+            )?;
 
             server.add_accessory(lightbulb).await?;
 

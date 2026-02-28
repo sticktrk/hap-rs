@@ -1,34 +1,46 @@
 use tokio;
 
 use hap::{
-    accessory::{bridge::BridgeAccessory, lightbulb::LightbulbAccessory, AccessoryCategory, AccessoryInformation},
+    accessory::{
+        bridge::BridgeAccessory, lightbulb::LightbulbAccessory, AccessoryCategory,
+        AccessoryInformation,
+    },
     characteristic::CharacteristicCallbacks,
     server::{IpServer, Server},
     storage::{FileStorage, Storage},
-    Config,
-    MacAddress,
-    Pin,
-    Result,
+    Config, MacAddress, Pin, Result,
 };
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let bridge = BridgeAccessory::new(1, AccessoryInformation {
-        name: "Acme Bridge".into(),
-        ..Default::default()
-    })?;
-    let mut lightbulb_1 = LightbulbAccessory::new(2, AccessoryInformation {
-        name: "Lightbulb 1".into(),
-        ..Default::default()
-    })?;
-    let mut lightbulb_2 = LightbulbAccessory::new(3, AccessoryInformation {
-        name: "Lightbulb 2".into(),
-        ..Default::default()
-    })?;
-    let mut lightbulb_3 = LightbulbAccessory::new(4, AccessoryInformation {
-        name: "Lightbulb 3".into(),
-        ..Default::default()
-    })?;
+    let bridge = BridgeAccessory::new(
+        1,
+        AccessoryInformation {
+            name: "Acme Bridge".into(),
+            ..Default::default()
+        },
+    )?;
+    let mut lightbulb_1 = LightbulbAccessory::new(
+        2,
+        AccessoryInformation {
+            name: "Lightbulb 1".into(),
+            ..Default::default()
+        },
+    )?;
+    let mut lightbulb_2 = LightbulbAccessory::new(
+        3,
+        AccessoryInformation {
+            name: "Lightbulb 2".into(),
+            ..Default::default()
+        },
+    )?;
+    let mut lightbulb_3 = LightbulbAccessory::new(
+        4,
+        AccessoryInformation {
+            name: "Lightbulb 3".into(),
+            ..Default::default()
+        },
+    )?;
 
     lightbulb_1
         .lightbulb
@@ -68,7 +80,7 @@ async fn main() -> Result<()> {
             config.redetermine_local_ip();
             storage.save_config(&config).await?;
             config
-        },
+        }
         Err(_) => {
             let config = Config {
                 pin: Pin::new([1, 1, 1, 2, 2, 3, 3, 3])?,
@@ -79,7 +91,7 @@ async fn main() -> Result<()> {
             };
             storage.save_config(&config).await?;
             config
-        },
+        }
     };
 
     let server = IpServer::new(config, storage).await?;

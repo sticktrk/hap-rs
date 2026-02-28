@@ -3,14 +3,11 @@
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use crate::{
-    service::HapService,
     characteristic::{
-        HapCharacteristic,
-		active::ActiveCharacteristic,
-		crypto_hash::CryptoHashCharacteristic,
-		tap_type::TapTypeCharacteristic,
-		token::TokenCharacteristic,
-	},
+        active::ActiveCharacteristic, crypto_hash::CryptoHashCharacteristic,
+        tap_type::TapTypeCharacteristic, token::TokenCharacteristic, HapCharacteristic,
+    },
+    service::HapService,
     HapType,
 };
 
@@ -28,15 +25,14 @@ pub struct TapManagementService {
     /// An array of numbers containing the instance IDs of the services that this service links to.
     linked_services: Vec<u64>,
 
-	/// Active characteristic (required).
-	pub active: ActiveCharacteristic,
-	/// Crypto Hash characteristic (required).
-	pub crypto_hash: CryptoHashCharacteristic,
-	/// Tap Type characteristic (required).
-	pub tap_type: TapTypeCharacteristic,
-	/// Token characteristic (required).
-	pub token: TokenCharacteristic,
-
+    /// Active characteristic (required).
+    pub active: ActiveCharacteristic,
+    /// Crypto Hash characteristic (required).
+    pub crypto_hash: CryptoHashCharacteristic,
+    /// Tap Type characteristic (required).
+    pub tap_type: TapTypeCharacteristic,
+    /// Token characteristic (required).
+    pub token: TokenCharacteristic,
 }
 
 impl TapManagementService {
@@ -45,11 +41,11 @@ impl TapManagementService {
         Self {
             id,
             hap_type: HapType::TapManagement,
-			active: ActiveCharacteristic::new(id + 1 + 0, accessory_id),
-			crypto_hash: CryptoHashCharacteristic::new(id + 1 + 1, accessory_id),
-			tap_type: TapTypeCharacteristic::new(id + 1 + 2, accessory_id),
-			token: TokenCharacteristic::new(id + 1 + 3, accessory_id),
-			..Default::default()
+            active: ActiveCharacteristic::new(id + 1 + 0, accessory_id),
+            crypto_hash: CryptoHashCharacteristic::new(id + 1 + 1, accessory_id),
+            tap_type: TapTypeCharacteristic::new(id + 1 + 2, accessory_id),
+            token: TokenCharacteristic::new(id + 1 + 3, accessory_id),
+            ..Default::default()
         }
     }
 }
@@ -115,24 +111,20 @@ impl HapService for TapManagementService {
 
     fn get_characteristics(&self) -> Vec<&dyn HapCharacteristic> {
         #[allow(unused_mut)]
-        let mut characteristics: Vec<&dyn HapCharacteristic> = vec![
-			&self.active,
-			&self.crypto_hash,
-			&self.tap_type,
-			&self.token,
-		];
-		characteristics
+        let mut characteristics: Vec<&dyn HapCharacteristic> =
+            vec![&self.active, &self.crypto_hash, &self.tap_type, &self.token];
+        characteristics
     }
 
     fn get_mut_characteristics(&mut self) -> Vec<&mut dyn HapCharacteristic> {
         #[allow(unused_mut)]
         let mut characteristics: Vec<&mut dyn HapCharacteristic> = vec![
-			&mut self.active,
-			&mut self.crypto_hash,
-			&mut self.tap_type,
-			&mut self.token,
-		];
-		characteristics
+            &mut self.active,
+            &mut self.crypto_hash,
+            &mut self.tap_type,
+            &mut self.token,
+        ];
+        characteristics
     }
 }
 

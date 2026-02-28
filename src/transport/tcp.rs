@@ -2,7 +2,7 @@ use byteorder::{ByteOrder, LittleEndian};
 use bytes::{Buf, BytesMut};
 use chacha20poly1305::{
     aead::{AeadInPlace, KeyInit},
-    ChaCha20Poly1305
+    ChaCha20Poly1305,
 };
 use generic_array::GenericArray;
 
@@ -68,11 +68,11 @@ impl StreamWrapper {
                 debug!("received {} Bytes on incoming TCP stream receiver", &r_len);
 
                 Poll::Ready(r_len)
-            },
+            }
             Poll::Ready(None) => {
                 debug!("received 0 Bytes on incoming TCP stream receiver");
                 Poll::Ready(0)
-            },
+            }
         }
     }
 }
@@ -110,13 +110,17 @@ impl AsyncRead for StreamWrapper {
                 }
 
                 Poll::Ready(Ok(()))
-            },
+            }
         }
     }
 }
 
 impl AsyncWrite for StreamWrapper {
-    fn poll_write(self: Pin<&mut Self>, _cx: &mut Context, buf: &[u8]) -> Poll<std::result::Result<usize, io::Error>> {
+    fn poll_write(
+        self: Pin<&mut Self>,
+        _cx: &mut Context,
+        buf: &[u8],
+    ) -> Poll<std::result::Result<usize, io::Error>> {
         let stream_wrapper = Pin::into_inner(self);
 
         debug!("writing {} Bytes to outgoing TCP stream sender", buf.len());
@@ -150,13 +154,19 @@ impl AsyncWrite for StreamWrapper {
         Poll::Ready(Ok(w_len))
     }
 
-    fn poll_flush(self: Pin<&mut Self>, _cx: &mut Context) -> Poll<std::result::Result<(), io::Error>> {
+    fn poll_flush(
+        self: Pin<&mut Self>,
+        _cx: &mut Context,
+    ) -> Poll<std::result::Result<(), io::Error>> {
         // let stream_wrapper = Pin::into_inner(self);
         // Poll::Ready(Write::flush(stream_wrapper))
         Poll::Ready(Ok(()))
     }
 
-    fn poll_shutdown(self: Pin<&mut Self>, _cx: &mut Context) -> Poll<std::result::Result<(), io::Error>> {
+    fn poll_shutdown(
+        self: Pin<&mut Self>,
+        _cx: &mut Context,
+    ) -> Poll<std::result::Result<(), io::Error>> {
         Poll::Ready(Ok(()))
     }
 }
@@ -282,7 +292,11 @@ impl EncryptedStream {
         Poll::Pending
     }
 
-    fn read_stream(&mut self, cx: &mut Context, buf: &mut ReadBuf) -> Poll<std::result::Result<(), io::Error>> {
+    fn read_stream(
+        &mut self,
+        cx: &mut Context,
+        buf: &mut ReadBuf,
+    ) -> Poll<std::result::Result<(), io::Error>> {
         debug!("reading from TCP stream");
 
         if self.missing_data_for_encrypted_buf {
@@ -302,7 +316,7 @@ impl EncryptedStream {
                     }
 
                     Poll::Pending
-                },
+                }
             }
         } else {
             let mut r_buf = ReadBuf::new(&mut self.encrypted_readbuf_inner);
@@ -314,7 +328,8 @@ impl EncryptedStream {
                     self.encrypted_buf.extend_from_slice(r_buf.filled());
 
                     if self.encrypted_buf.len() >= 2 {
-                        self.packet_len = LittleEndian::read_u16(&self.encrypted_buf[..2]) as usize + 16;
+                        self.packet_len =
+                            LittleEndian::read_u16(&self.encrypted_buf[..2]) as usize + 16;
 
                         if self.encrypted_buf.len() == self.packet_len + 2 {
                             self.missing_data_for_encrypted_buf = false;
@@ -329,43 +344,52 @@ impl EncryptedStream {
                     } else {
                         Poll::Pending
                     }
-                },
+                }
             }
         }
     }
 
-    fn poll_outgoing(self: Pin<&mut Self>, cx: &mut Context) -> Poll<std::result::Result<(), io::Error>> {
+    fn poll_outgoing(
+        self: Pin<&mut Self>,
+        cx: &mut Context,
+    ) -> Poll<std::result::Result<(), io::Error>> {
         let encrypted_stream = Pin::into_inner(self);
         loop {
             match Stream::poll_next(Pin::new(&mut encrypted_stream.outgoing_receiver), cx) {
                 Poll::Pending => {
-                    *encrypted_stream.outgoing_waker.lock().expect("setting outgoing_waker") = Some(cx.waker().clone());
+                    *encrypted_stream
+                        .outgoing_waker
+                        .lock()
+                        .expect("setting outgoing_waker") = Some(cx.waker().clone());
                     return Poll::Pending;
-                },
+                }
                 Poll::Ready(Some(data)) => {
                     debug!("writing {} Bytes to outgoing TCP stream", data.len());
 
                     match AsyncWrite::poll_write(Pin::new(encrypted_stream), cx, &data) {
-                        Poll::Pending => {},
+                        Poll::Pending => {}
                         Poll::Ready(Err(e)) => {
                             error!("error writing to outgoing stream: {}", e);
                             return Poll::Ready(Err(e));
-                        },
+                        }
                         Poll::Ready(Ok(w_len)) => {
                             debug!("wrote {} Bytes to outgoing TCP stream", w_len);
-                        },
+                        }
                     };
-                },
+                }
                 Poll::Ready(None) => {
                     debug!("outgoing TCP stream ended");
 
                     return Poll::Ready(Ok(()));
-                },
+                }
             }
         }
     }
 
-    fn poll_incoming(self: Pin<&mut Self>, cx: &mut Context) -> Poll<std::result::Result<(), io::Error>> {
+    fn poll_incoming(
+        self: Pin<&mut Self>,
+        cx: &mut Context,
+    ) -> Poll<std::result::Result<(), io::Error>> {
         let encrypted_stream = Pin::into_inner(self);
 
         let mut data_inner = [0; 1536];
@@ -374,18 +398,23 @@ impl EncryptedStream {
         loop {
             match AsyncRead::poll_read(Pin::new(encrypted_stream), cx, &mut data) {
                 Poll::Pending => {
-                    *encrypted_stream.incoming_waker.lock().expect("setting incoming_waker") = Some(cx.waker().clone());
+                    *encrypted_stream
+                        .incoming_waker
+                        .lock()
+                        .expect("setting incoming_waker") = Some(cx.waker().clone());
                     return Poll::Pending;
-                },
+                }
                 Poll::Ready(Err(e)) => match e.kind() {
                     ErrorKind::WouldBlock => {
-                        *encrypted_stream.incoming_waker.lock().expect("setting incoming_waker") =
-                            Some(cx.waker().clone());
+                        *encrypted_stream
+                            .incoming_waker
+                            .lock()
+                            .expect("setting incoming_waker") = Some(cx.waker().clone());
                         return Poll::Pending;
-                    },
+                    }
                     _ => {
                         return Poll::Ready(Err(e));
-                    },
+                    }
                 },
                 Poll::Ready(Ok(())) => {
                     let data_filled = data.filled();
@@ -397,10 +426,12 @@ impl EncryptedStream {
                     encrypted_stream
                         .incoming_sender
                         .unbounded_send(data_filled.to_vec())
-                        .map_err(|_| io::Error::new(io::ErrorKind::Other, "couldn't send incoming data"))?;
+                        .map_err(|_| {
+                            io::Error::new(io::ErrorKind::Other, "couldn't send incoming data")
+                        })?;
 
                     data.clear();
-                },
+                }
             }
         }
     }
@@ -428,13 +459,15 @@ impl AsyncRead for EncryptedStream {
         if encrypted_stream.shared_secret.is_none() {
             match encrypted_stream.session_receiver.try_recv() {
                 Ok(Some(session)) => {
-                    *encrypted_stream.controller_id.write().expect("setting controller_id") =
-                        Some(session.controller_id);
+                    *encrypted_stream
+                        .controller_id
+                        .write()
+                        .expect("setting controller_id") = Some(session.controller_id);
                     encrypted_stream.shared_secret = Some(session.shared_secret);
-                },
+                }
                 _ => {
                     return AsyncRead::poll_read(Pin::new(&mut encrypted_stream.stream), cx, buf);
-                },
+                }
             }
         }
 
@@ -452,16 +485,23 @@ impl AsyncRead for EncryptedStream {
 
 impl AsyncWrite for EncryptedStream {
     #[allow(unused_must_use)]
-    fn poll_write(self: Pin<&mut Self>, cx: &mut Context, buf: &[u8]) -> Poll<std::result::Result<usize, Error>> {
+    fn poll_write(
+        self: Pin<&mut Self>,
+        cx: &mut Context,
+        buf: &[u8],
+    ) -> Poll<std::result::Result<usize, Error>> {
         let encrypted_stream = Pin::into_inner(self);
 
         if let Some(shared_secret) = encrypted_stream.shared_secret {
             let mut write_buf = BytesMut::from(buf);
 
             while write_buf.len() > 1024 {
-                let (aad, chunk, auth_tag) =
-                    encrypt_chunk(&shared_secret, &write_buf[..1024], &mut encrypted_stream.encrypt_count)
-                        .map_err(|_| io::Error::new(io::ErrorKind::Other, "encryption failed"))?;
+                let (aad, chunk, auth_tag) = encrypt_chunk(
+                    &shared_secret,
+                    &write_buf[..1024],
+                    &mut encrypted_stream.encrypt_count,
+                )
+                .map_err(|_| io::Error::new(io::ErrorKind::Other, "encryption failed"))?;
 
                 let data = [&aad[..], &chunk[..], &auth_tag[..]].concat();
                 AsyncWrite::poll_write(Pin::new(&mut encrypted_stream.stream), cx, &data)?;
@@ -469,8 +509,12 @@ impl AsyncWrite for EncryptedStream {
                 write_buf.advance(1024);
             }
 
-            let (aad, chunk, auth_tag) = encrypt_chunk(&shared_secret, &write_buf, &mut encrypted_stream.encrypt_count)
-                .map_err(|_| io::Error::new(io::ErrorKind::Other, "encryption failed"))?;
+            let (aad, chunk, auth_tag) = encrypt_chunk(
+                &shared_secret,
+                &write_buf,
+                &mut encrypted_stream.encrypt_count,
+            )
+            .map_err(|_| io::Error::new(io::ErrorKind::Other, "encryption failed"))?;
 
             let data = [&aad[..], &chunk[..], &auth_tag[..]].concat();
             AsyncWrite::poll_write(Pin::new(&mut encrypted_stream.stream), cx, &data)?;
@@ -486,7 +530,10 @@ impl AsyncWrite for EncryptedStream {
         AsyncWrite::poll_flush(Pin::new(&mut encrypted_stream.stream), cx)
     }
 
-    fn poll_shutdown(self: Pin<&mut Self>, _cx: &mut Context) -> Poll<std::result::Result<(), Error>> {
+    fn poll_shutdown(
+        self: Pin<&mut Self>,
+        _cx: &mut Context,
+    ) -> Poll<std::result::Result<(), Error>> {
         Poll::Ready(Ok(()))
     }
 }
@@ -509,12 +556,21 @@ fn decrypt_chunk(
 
     let mut buffer = Vec::new();
     buffer.extend_from_slice(data);
-    aead.decrypt_in_place_detached(GenericArray::from_slice(&nonce).as_0_14(), aad, &mut buffer, GenericArray::from_slice(&auth_tag).as_0_14())?;
+    aead.decrypt_in_place_detached(
+        GenericArray::from_slice(&nonce).as_0_14(),
+        aad,
+        &mut buffer,
+        GenericArray::from_slice(&auth_tag).as_0_14(),
+    )?;
 
     Ok(buffer)
 }
 
-fn encrypt_chunk(shared_secret: &[u8; 32], data: &[u8], count: &mut u64) -> Result<([u8; 2], Vec<u8>, [u8; 16])> {
+fn encrypt_chunk(
+    shared_secret: &[u8; 32],
+    data: &[u8],
+    count: &mut u64,
+) -> Result<([u8; 2], Vec<u8>, [u8; 16])> {
     let write_key = compute_write_key(shared_secret)?;
     let chachakey = GenericArray::from_slice(&write_key);
     let aead = ChaCha20Poly1305::new(&chachakey.as_0_14());
@@ -530,7 +586,11 @@ fn encrypt_chunk(shared_secret: &[u8; 32], data: &[u8], count: &mut u64) -> Resu
 
     let mut buffer = Vec::new();
     buffer.extend_from_slice(data);
-    let auth_tag = aead.encrypt_in_place_detached(GenericArray::from_slice(&nonce).as_0_14(), &aad, &mut buffer)?;
+    let auth_tag = aead.encrypt_in_place_detached(
+        GenericArray::from_slice(&nonce).as_0_14(),
+        &aad,
+        &mut buffer,
+    )?;
 
     Ok((aad, buffer, auth_tag.into()))
 }
