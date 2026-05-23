@@ -262,6 +262,8 @@ impl Server for IpServer {
             let mut config = self.config.lock().await;
             config.configuration_number += 1;
             self.storage.lock().await.save_config(&config).await?;
+            drop(config);
+            self.mdns_responder.lock().await.update_records().await;
         }
 
         Ok(accessory)
@@ -283,6 +285,9 @@ impl Server for IpServer {
 
             let mut config = self.config.lock().await;
             config.configuration_number += 1;
+            self.storage.lock().await.save_config(&config).await?;
+            drop(config);
+            self.mdns_responder.lock().await.update_records().await;
         }
 
         Ok(())

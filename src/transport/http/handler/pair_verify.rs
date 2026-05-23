@@ -8,7 +8,7 @@ use futures::{
 };
 use generic_array::GenericArray;
 use hyper::{body::Buf, Body};
-use log::{debug, info};
+use log::{debug, info, warn};
 use signature::{Signer, Verifier};
 use std::str;
 use uuid::Uuid;
@@ -242,7 +242,18 @@ async fn handle_finish(
             let uuid_str = str::from_utf8(device_pairing_id)?;
             let pairing_uuid = Uuid::parse_str(uuid_str)?;
             debug!("device pairing UUID: {:?}", &pairing_uuid);
-            let pairing = storage.lock().await.load_pairing(&pairing_uuid).await?;
+            let pairing = storage
+                .lock()
+                .await
+                .load_pairing(&pairing_uuid)
+                .await
+                .map_err(|error| {
+                    warn!(
+                        "pair verify M3: controller {} is not paired or could not be loaded: {:?}",
+                        pairing_uuid, error
+                    );
+                    tlv::Error::Authentication
+                })?;
             debug!("loaded pairing: {:?}", &pairing);
 
             let mut device_info: Vec<u8> = Vec::new();
