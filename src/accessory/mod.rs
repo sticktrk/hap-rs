@@ -8,8 +8,10 @@ use crate::{
         configured_name::ConfiguredNameCharacteristic,
         firmware_revision::FirmwareRevisionCharacteristic,
         hardware_finish::HardwareFinishCharacteristic,
-        hardware_revision::HardwareRevisionCharacteristic, product_data::ProductDataCharacteristic,
-        software_revision::SoftwareRevisionCharacteristic, HapCharacteristic,
+        hardware_revision::HardwareRevisionCharacteristic,
+        matter_firmware_revision_number::MatterFirmwareRevisionNumberCharacteristic,
+        product_data::ProductDataCharacteristic, software_revision::SoftwareRevisionCharacteristic,
+        HapCharacteristic,
     },
     pointer,
     service::{accessory_information::AccessoryInformationService, HapService},
@@ -102,6 +104,7 @@ pub struct AccessoryInformation {
     pub accessory_flags: Option<u32>,
     pub application_matching_identifier: Option<Vec<u8>>,
     pub configured_name: Option<String>,
+    pub matter_firmware_revision_number: Option<u32>,
     /// Describes a firmware revision string x[.y[.z]] (e.g. "100.1.1"):
     /// - <x> is the major version number, required.
     /// - <y> is the minor version number, required if it is non-zero or if <z> is present.
@@ -153,8 +156,10 @@ impl AccessoryInformation {
                 .set_value(serde_json::Value::String(self.serial_number)),
         )?;
 
+        let mut next_id = id + 6;
         if let Some(v) = self.accessory_flags {
-            let mut c = AccessoryFlagsCharacteristic::new(id + 6, accessory_id);
+            let mut c = AccessoryFlagsCharacteristic::new(next_id, accessory_id);
+            next_id += 1;
             executor::block_on(c.set_value(v.into()))?;
             i.accessory_flags = Some(c);
         } else {
@@ -162,7 +167,8 @@ impl AccessoryInformation {
         }
 
         if let Some(v) = self.application_matching_identifier {
-            let mut c = ApplicationMatchingIdentifierCharacteristic::new(id + 7, accessory_id);
+            let mut c = ApplicationMatchingIdentifierCharacteristic::new(next_id, accessory_id);
+            next_id += 1;
             executor::block_on(c.set_value(v.into()))?;
             i.application_matching_identifier = Some(c);
         } else {
@@ -170,15 +176,26 @@ impl AccessoryInformation {
         }
 
         if let Some(v) = self.configured_name {
-            let mut c = ConfiguredNameCharacteristic::new(id + 8, accessory_id);
+            let mut c = ConfiguredNameCharacteristic::new(next_id, accessory_id);
+            next_id += 1;
             executor::block_on(c.set_value(v.into()))?;
             i.configured_name = Some(c);
         } else {
             i.configured_name = None;
         }
 
+        if let Some(v) = self.matter_firmware_revision_number {
+            let mut c = MatterFirmwareRevisionNumberCharacteristic::new(next_id, accessory_id);
+            next_id += 1;
+            executor::block_on(c.set_value(v.into()))?;
+            i.matter_firmware_revision_number = Some(c);
+        } else {
+            i.matter_firmware_revision_number = None;
+        }
+
         if let Some(v) = self.firmware_revision {
-            let mut c = FirmwareRevisionCharacteristic::new(id + 9, accessory_id);
+            let mut c = FirmwareRevisionCharacteristic::new(next_id, accessory_id);
+            next_id += 1;
             executor::block_on(c.set_value(v.into()))?;
             i.firmware_revision = Some(c);
         } else {
@@ -186,7 +203,8 @@ impl AccessoryInformation {
         }
 
         if let Some(v) = self.hardware_finish {
-            let mut c = HardwareFinishCharacteristic::new(id + 12, accessory_id);
+            let mut c = HardwareFinishCharacteristic::new(next_id, accessory_id);
+            next_id += 1;
             executor::block_on(c.set_value(v.into()))?;
             i.hardware_finish = Some(c);
         } else {
@@ -194,7 +212,8 @@ impl AccessoryInformation {
         }
 
         if let Some(v) = self.hardware_revision {
-            let mut c = HardwareRevisionCharacteristic::new(id + 10, accessory_id);
+            let mut c = HardwareRevisionCharacteristic::new(next_id, accessory_id);
+            next_id += 1;
             executor::block_on(c.set_value(v.into()))?;
             i.hardware_revision = Some(c);
         } else {
@@ -202,7 +221,8 @@ impl AccessoryInformation {
         }
 
         if let Some(v) = self.product_data {
-            let mut c = ProductDataCharacteristic::new(id + 12, accessory_id);
+            let mut c = ProductDataCharacteristic::new(next_id, accessory_id);
+            next_id += 1;
             executor::block_on(c.set_value(v.into()))?;
             i.product_data = Some(c);
         } else {
@@ -210,7 +230,7 @@ impl AccessoryInformation {
         }
 
         if let Some(v) = self.software_revision {
-            let mut c = SoftwareRevisionCharacteristic::new(id + 11, accessory_id);
+            let mut c = SoftwareRevisionCharacteristic::new(next_id, accessory_id);
             executor::block_on(c.set_value(v.into()))?;
             i.software_revision = Some(c);
         } else {
@@ -231,11 +251,66 @@ impl Default for AccessoryInformation {
             accessory_flags: None,
             application_matching_identifier: None,
             configured_name: None,
+            matter_firmware_revision_number: None,
             firmware_revision: None,
             hardware_finish: None,
             hardware_revision: None,
             product_data: None,
             software_revision: None,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashSet;
+
+    use super::{
+        lightbulb::LightbulbAccessory, switch::SwitchAccessory, AccessoryInformation, HapAccessory,
+    };
+    use crate::HapType;
+
+    fn assert_unique_iids(accessory: &dyn HapAccessory) {
+        let mut seen = HashSet::new();
+        for service in accessory.get_services() {
+            assert!(seen.insert(service.get_id()), "duplicate service iid");
+            for characteristic in service.get_characteristics() {
+                assert!(
+                    seen.insert(characteristic.get_id()),
+                    "duplicate characteristic iid {}",
+                    characteristic.get_id()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn accessory_information_optionals_are_absent_by_default() {
+        let accessory =
+            SwitchAccessory::new(1, AccessoryInformation::default()).expect("switch accessory");
+        let information = accessory
+            .get_service(HapType::AccessoryInformation)
+            .expect("accessory information service");
+
+        assert!(information
+            .get_characteristic(HapType::MatterFirmwareRevisionNumber)
+            .is_none());
+        assert!(information
+            .get_characteristic(HapType::FirmwareRevision)
+            .is_none());
+        assert_unique_iids(&accessory);
+    }
+
+    #[test]
+    fn accessory_information_optionals_do_not_create_iid_gaps() {
+        let information = AccessoryInformation {
+            matter_firmware_revision_number: Some(42),
+            firmware_revision: Some("1.2.3".to_string()),
+            software_revision: Some("1.2.3".to_string()),
+            ..Default::default()
+        };
+        let accessory = LightbulbAccessory::new(1, information).expect("lightbulb accessory");
+
+        assert_unique_iids(&accessory);
     }
 }
