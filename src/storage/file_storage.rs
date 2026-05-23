@@ -4,7 +4,7 @@ use std::{
     env,
     ffi::OsStr,
     fs,
-    io::{BufReader, BufWriter, Read, Write},
+    io::{BufReader, BufWriter, ErrorKind, Read, Write},
     path::{Path, PathBuf},
     str,
 };
@@ -204,7 +204,11 @@ impl Storage for FileStorage {
 
     async fn delete_pairing(&mut self, id: &Uuid) -> Result<()> {
         let key = format!("pairings/{}.json", id.to_string());
-        self.remove_file(&key).await
+        match self.remove_file(&key).await {
+            Ok(()) => Ok(()),
+            Err(Error::Io(err)) if err.kind() == ErrorKind::NotFound => Ok(()),
+            Err(err) => Err(err),
+        }
     }
 
     async fn list_pairings(&self) -> Result<Vec<Pairing>> {
@@ -367,6 +371,7 @@ mod tests {
         assert_eq!(&saved_pairing, &pairing);
 
         // delete the pairing
+        storage.delete_pairing(&pairing.id).await.unwrap();
         storage.delete_pairing(&pairing.id).await.unwrap();
 
         // after deleting the previously saved pairing, it should count 0 again, list an empty
